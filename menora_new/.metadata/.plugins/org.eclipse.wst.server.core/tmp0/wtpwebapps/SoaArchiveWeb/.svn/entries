@@ -1,0 +1,182 @@
+9
+
+dir
+0
+http://190.1.0.2/mnr_repos/ESB/SoaArchiveWeb/src/main/webapp
+http://190.1.0.2/mnr_repos/ESB
+add
+
+
+
+
+
+
+
+svn:special svn:externals svn:needs-lock
+
+
+
+
+
+
+
+
+
+
+
+db950039-5e22-0510-97c5-1f4afcf59773
+
+DataTables-1.10.12
+dir
+
+
+
+add
+
+SoaArchiveClient
+dir
+
+
+
+add
+
+WEB-INF
+dir
+
+
+
+add
+
+dataTables.checkboxes.css
+file
+
+
+
+add
+
+dataTables.checkboxes.js
+file
+
+
+
+add
+
+dataTables.checkboxes.min.js
+file
+
+
+
+add
+
+dataTables.material.min.css
+file
+
+
+
+add
+
+dataTables.material.min.js
+file
+
+
+
+add
+
+datatables.css
+file
+
+
+
+add
+
+datatables.js
+file
+
+
+
+add
+
+fontawesome-4.3.0
+dir
+
+
+
+add
+
+images
+dir
+
+
+
+add
+
+index.jsp
+file
+
+
+
+add
+
+jquery-1.11.2
+dir
+
+
+
+add
+
+jquery-1.12.4.min.js
+file
+
+
+
+add
+
+login.jsp
+file
+
+
+
+add
+
+loginError.jsp
+file
+
+
+
+add
+
+logout.jsp
+file
+
+
+
+add
+
+material.min.css
+file
+
+
+
+add
+
+shared-styles.html
+file
+
+
+
+add
+
+soaarchive.json
+file
+
+
+
+add
+
+test.jsp
+file
+
+
+
+add
+

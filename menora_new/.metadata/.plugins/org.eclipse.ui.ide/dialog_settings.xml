@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<section name="Workbench">
+	<section name="WORKBENCH_SETTINGS">
+		<list key="ENABLED_TRANSFERS">
+		</list>
+	</section>
+	<section name="ChooseWorkspaceDialogSettings">
+		<item value="339" key="DIALOG_X_ORIGIN"/>
+		<item value="142" key="DIALOG_Y_ORIGIN"/>
+	</section>
+	<section name="org.eclipse.ui.dialogs.FilteredResourcesSelectionDialog">
+		<item value="false" key="FilterByLocation"/>
+		<item value="true" key="ShowStatusLine"/>
+		<item value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&#x0A;&lt;History&gt;&#x0A;&lt;historyRootNode&gt;&#x0A;&lt;infoNode path=&quot;/SoaArchiveWeb/src/main/java/test/TestServlet.java&quot; type=&quot;1&quot;/&gt;&#x0A;&lt;infoNode path=&quot;/SoaArchiveClient/src/main/java/il/co/menora/soaarchive/shared/IncomingDto.java&quot; type=&quot;1&quot;/&gt;&#x0A;&lt;infoNode path=&quot;/SoaArchiveClient/src/main/java/il/co/menora/soaarchive/shared/IncomingDtoEx.java&quot; type=&quot;1&quot;/&gt;&#x0A;&lt;infoNode path=&quot;/SoaArchiveClient/src/main/java/il/co/menora/soaarchive/client/bundle/ClientResources.java&quot; type=&quot;1&quot;/&gt;&#x0A;&lt;infoNode path=&quot;/SoaArchiveEjb/src/main/java/il/co/menora/soaarchive/ejb/GeneralBean.java&quot; type=&quot;1&quot;/&gt;&#x0A;&lt;infoNode path=&quot;/SoaArchiveClient/src/main/java/il/co/menora/soaarchive/client/widgets/layout/OutgoingPage.java&quot; type=&quot;1&quot;/&gt;&#x0A;&lt;infoNode path=&quot;/SoaArchiveClient/src/main/java/il/co/menora/soaarchive/client/widgets/layout/OutgoingPage.ui.xml&quot; type=&quot;1&quot;/&gt;&#x0A;&lt;infoNode path=&quot;/SoaArchiveEjb/src/main/java/il/co/menora/soaarchive/mq/SendMQRequest.java&quot; type=&quot;1&quot;/&gt;&#x0A;&lt;infoNode path=&quot;/SoaArchiveEjb/src/main/java/il/co/menora/soaarchive/entities/Incoming.java&quot; type=&quot;1&quot;/&gt;&#x0A;&lt;infoNode path=&quot;/SoaArchiveWeb/src/main/java/il/co/menora/soaarchive/web/filters/SecurityFilter.java&quot; type=&quot;1&quot;/&gt;&#x0A;&lt;infoNode path=&quot;/SoaArchiveWeb/src/main/webapp/WEB-INF/web.xml&quot; type=&quot;1&quot;/&gt;&#x0A;&lt;infoNode path=&quot;/SoaArchiveClient/src/main/java/il/co/menora/soaarchive/client/rpc/SoaArchiveService.java&quot; type=&quot;1&quot;/&gt;&#x0A;&lt;infoNode path=&quot;/SoaArchiveClient/src/main/java/il/co/menora/soaarchive/client/widgets/layout/InfoPanel.ui.xml&quot; type=&quot;1&quot;/&gt;&#x0A;&lt;infoNode path=&quot;/SoaArchiveWeb/src/main/webapp/shared-styles.html&quot; type=&quot;1&quot;/&gt;&#x0A;&lt;infoNode path=&quot;/SoaArchive/a.sql&quot; type=&quot;1&quot;/&gt;&#x0A;&lt;infoNode path=&quot;/SoaArchiveEjb/src/main/java/il/co/menora/soaarchive/entities/Outgoing.java&quot; type=&quot;1&quot;/&gt;&#x0A;&lt;infoNode path=&quot;/SoaArchiveClient/src/main/java/il/co/menora/soaarchive/client/bundle/style/style.gss&quot; type=&quot;1&quot;/&gt;&#x0A;&lt;infoNode path=&quot;/SoaArchiveEjb/src/main/java/il/co/menora/soaarchive/ejb/IncomingDao.java&quot; type=&quot;1&quot;/&gt;&#x0A;&lt;infoNode path=&quot;/SoaArchiveClient/src/main/java/il/co/menora/soaarchive/client/widgets/layout/DataTablePage.java&quot; type=&quot;1&quot;/&gt;&#x0A;&lt;infoNode path=&quot;/SoaArchiveWeb/src/main/webapp/index.jsp&quot; type=&quot;1&quot;/&gt;&#x0A;&lt;infoNode path=&quot;/SoaArchiveEjb/src/main/resources/soaarchive.properties&quot; type=&quot;1&quot;/&gt;&#x0A;&lt;infoNode path=&quot;/SoaArchiveEjb/src/main/java/il/co/menora/soaarchive/mq/MQRequestsHandler.java&quot; type=&quot;1&quot;/&gt;&#x0A;&lt;/historyRootNode&gt;&#x0A;&lt;/History&gt;" key="History"/>
+		<item value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&#x0A;&lt;workingSet workingSetName=&quot;&quot;/&gt;" key="WorkingSet"/>
+		<item value="false" key="ShowDerived"/>
+		<section name="DialogBoundsSettings">
+			<item value="600" key="DIALOG_WIDTH"/>
+			<item value="1|Ubuntu|11.0|0|GTK|1|" key="DIALOG_FONT_NAME"/>
+			<item value="500" key="DIALOG_HEIGHT"/>
+			<item value="383" key="DIALOG_X_ORIGIN"/>
+			<item value="21" key="DIALOG_Y_ORIGIN"/>
+		</section>
+	</section>
+</section>

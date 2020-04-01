@@ -1,0 +1,56 @@
+9
+
+dir
+0
+http://190.1.0.2/mnr_repos/ESB/SoaArchiveWeb/src/main/webapp/fontawesome-4.3.0
+http://190.1.0.2/mnr_repos/ESB
+add
+
+
+
+
+
+
+
+svn:special svn:externals svn:needs-lock
+
+
+
+
+
+
+
+
+
+
+
+db950039-5e22-0510-97c5-1f4afcf59773
+
+css
+dir
+
+
+
+add
+
+fonts
+dir
+
+
+
+add
+
+less
+dir
+
+
+
+add
+
+scss
+dir
+
+
+
+add
+

@@ -1,0 +1,10 @@
+/home/oded/workspaces/menora_new/SoaArchive/SoaArchiveEjb/src/main/java/il/co/menora/soaarchive/mq/SendMQResponse.java
+/home/oded/workspaces/menora_new/SoaArchive/SoaArchiveEjb/src/main/java/il/co/menora/soaarchive/ejb/GeneralBean.java
+/home/oded/workspaces/menora_new/SoaArchive/SoaArchiveEjb/src/main/java/il/co/menora/soaarchive/entities/Payload.java
+/home/oded/workspaces/menora_new/SoaArchive/SoaArchiveEjb/src/main/java/il/co/menora/soaarchive/entities/QmgrAlias.java
+/home/oded/workspaces/menora_new/SoaArchive/SoaArchiveEjb/src/main/java/il/co/menora/soaarchive/entities/Outgoing.java
+/home/oded/workspaces/menora_new/SoaArchive/SoaArchiveEjb/src/main/java/il/co/menora/soaarchive/entities/QMgrConnData.java
+/home/oded/workspaces/menora_new/SoaArchive/SoaArchiveEjb/src/main/java/il/co/menora/soaarchive/mq/MQRequestsHandler.java
+/home/oded/workspaces/menora_new/SoaArchive/SoaArchiveEjb/src/main/java/il/co/menora/soaarchive/ejb/IncomingDao.java
+/home/oded/workspaces/menora_new/SoaArchive/SoaArchiveEjb/src/main/java/il/co/menora/soaarchive/mq/SendMQRequest.java
+/home/oded/workspaces/menora_new/SoaArchive/SoaArchiveEjb/src/main/java/il/co/menora/soaarchive/entities/Incoming.java

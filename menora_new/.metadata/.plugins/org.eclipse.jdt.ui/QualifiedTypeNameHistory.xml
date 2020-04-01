@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<qualifiedTypeNameHistroy>
+<fullyQualifiedTypeName name="com.gargoylesoftware.htmlunit.javascript.host.Console"/>
+<fullyQualifiedTypeName name="javax.servlet.annotation.WebFilter"/>
+<fullyQualifiedTypeName name="il.co.menora.soaarchive.web.filters.SecurityFilter"/>
+<fullyQualifiedTypeName name="javax.servlet.annotation.WebListener"/>
+<fullyQualifiedTypeName name="org.apache.commons.lang3.StringUtils"/>
+<fullyQualifiedTypeName name="com.vaadin.polymer.Polymer"/>
+<fullyQualifiedTypeName name="il.co.menora.soaarchive.client.bundle.ClientResources"/>
+<fullyQualifiedTypeName name="com.vaadin.polymer.paper.widget.PaperDialogScrollable"/>
+<fullyQualifiedTypeName name="javax.print.attribute.standard.DialogTypeSelection"/>
+<fullyQualifiedTypeName name="com.vaadin.polymer.paper.PaperDialogScrollableElement"/>
+<fullyQualifiedTypeName name="com.google.gwt.user.client.ui.DialogBox"/>
+<fullyQualifiedTypeName name="com.google.gwt.user.client.ui.PopupPanel"/>
+<fullyQualifiedTypeName name="com.google.gwt.user.client.ui.ScrollPanel"/>
+<fullyQualifiedTypeName name="com.google.gwt.user.client.Window"/>
+<fullyQualifiedTypeName name="il.co.menora.soaarchive.client.widgets.layout.InfoPanel"/>
+<fullyQualifiedTypeName name="com.google.gwt.uibinder.client.UiField"/>
+<fullyQualifiedTypeName name="com.vaadin.polymer.paper.widget.PaperCard"/>
+<fullyQualifiedTypeName name="com.vaadin.polymer.paper.widget.PaperButton"/>
+<fullyQualifiedTypeName name="com.google.gwt.event.dom.client.ClickHandler"/>
+<fullyQualifiedTypeName name="il.co.menora.soaarchive.client.widgets.layout.ClosablePopup"/>
+<fullyQualifiedTypeName name="com.vaadin.polymer.paper.widget.PaperRadioButton"/>
+<fullyQualifiedTypeName name="com.google.gwt.user.client.Window.Location"/>
+</qualifiedTypeNameHistroy>

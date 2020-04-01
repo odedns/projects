@@ -1,0 +1,32 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui"
+	xmlns:v="urn:import:com.vaadin.polymer.vaadin.widget">
+	<ui:with field='res' type='il.co.menora.soaarchive.client.bundle.ClientResources' />
+
+	<g:HTMLPanel ui:field="mainPanel" addStyleNames="HomePage">
+		<style is="custom-style">
+			.add {
+			position: absolute;
+			bottom: 20px;
+			left: 20px;
+			--paper-fab-background:
+			var(--paper-red-500);
+			}
+		</style>
+
+		<paper-fab ui:field="addButton" icon="add" title="add"
+			class="add" />
+		ברוכים הבאים לפורטל המשימות.
+		<br />
+		<br />
+		<br />
+		<br />
+		<br />
+		<span ui:field="timeSpan" />
+		<br />
+		
+				
+		<paper-button ui:field="aboutButton" raised="">אודות</paper-button>
+	</g:HTMLPanel>
+</ui:UiBinder> 

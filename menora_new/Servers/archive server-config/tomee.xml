@@ -1,0 +1,17 @@
+<tomee>
+
+<Resource id="soaarchiveDS" type="DataSource">
+    #  Oracle example
+    #
+    #  This connector will not work until you download the driver at:
+    #  http://otn.oracle.com/software/tech/java/sqlj_jdbc/content.html
+    JdbcDriver  oracle.jdbc.OracleDriver
+    JdbcUrl jdbc:oracle:thin:@172.22.4.209:1522:soadvx1
+    UserName    soa
+    Password    soa
+	JtaManaged true  
+	testOnBorrow true
+	validationQuery "select 1 from dual"  
+
+</Resource>
+</tomee>

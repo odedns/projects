@@ -1,0 +1,442 @@
+	š21:46:29.976 [Test worker] WARN org.apache.kafka.clients.producer.internals.ProducerInterceptors - Error executing interceptor onAcknowledgement callback
+	jorg.apache.kafka.common.KafkaException: Injected exception in AppendProducerInterceptor.onAcknowledgement
+	œ	at test.org.apache.kafka.clients.producer.internals.ProducerInterceptorsTest$AppendProducerInterceptor.onAcknowledgement(ProducerInterceptorsTest.java:77)
+	u	at org.apache.kafka.clients.producer.internals.ProducerInterceptors.onAcknowledgement(ProducerInterceptors.java:88)
+	Œ	at test.org.apache.kafka.clients.producer.internals.ProducerInterceptorsTest.testOnAcknowledgementChain(ProducerInterceptorsTest.java:151)
+	@	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	R	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	Z	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	5	at java.lang.reflect.Method.invoke(Method.java:498)
+	Y	at org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:50)
+	X	at org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:12)
+	W	at org.junit.runners.model.FrameworkMethod.invokeExplosively(FrameworkMethod.java:47)
+	V	at org.junit.internal.runners.statements.InvokeMethod.evaluate(InvokeMethod.java:17)
+	B	at org.junit.runners.ParentRunner.runLeaf(ParentRunner.java:325)
+	V	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:78)
+	V	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:57)
+	@	at org.junit.runners.ParentRunner$3.run(ParentRunner.java:290)
+	D	at org.junit.runners.ParentRunner$1.schedule(ParentRunner.java:71)
+	F	at org.junit.runners.ParentRunner.runChildren(ParentRunner.java:288)
+	D	at org.junit.runners.ParentRunner.access$000(ParentRunner.java:58)
+	E	at org.junit.runners.ParentRunner$2.evaluate(ParentRunner.java:268)
+	>	at org.junit.runners.ParentRunner.run(ParentRunner.java:363)
+	u	at org.gradle.api.internal.tasks.testing.junit.JUnitTestClassExecuter.runTestClass(JUnitTestClassExecuter.java:114)
+	o	at org.gradle.api.internal.tasks.testing.junit.JUnitTestClassExecuter.execute(JUnitTestClassExecuter.java:57)
+	z	at org.gradle.api.internal.tasks.testing.junit.JUnitTestClassProcessor.processTestClass(JUnitTestClassProcessor.java:66)
+	t	at org.gradle.api.internal.tasks.testing.SuiteTestClassProcessor.processTestClass(SuiteTestClassProcessor.java:51)
+	@	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	R	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	Z	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	5	at java.lang.reflect.Method.invoke(Method.java:498)
+	Y	at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:35)
+	Y	at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:24)
+	i	at org.gradle.internal.dispatch.ContextClassLoaderDispatch.dispatch(ContextClassLoaderDispatch.java:32)
+	x	at org.gradle.internal.dispatch.ProxyDispatchAdapter$DispatchingInvocationHandler.invoke(ProxyDispatchAdapter.java:93)
+	;	at com.sun.proxy.$Proxy2.processTestClass(Unknown Source)
+	b	at org.gradle.api.internal.tasks.testing.worker.TestWorker.processTestClass(TestWorker.java:109)
+	@	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	R	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	Z	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	5	at java.lang.reflect.Method.invoke(Method.java:498)
+	Y	at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:35)
+	Y	at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:24)
+	X	at org.gradle.internal.remote.internal.hub.MessageHub$Handler.run(MessageHub.java:377)
+	k	at org.gradle.internal.concurrent.ExecutorPolicy$CatchAndRecordFailures.onExecute(ExecutorPolicy.java:54)
+	^	at org.gradle.internal.concurrent.StoppableExecutorImpl$1.run(StoppableExecutorImpl.java:40)
+	T	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
+	T	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
+	*	at java.lang.Thread.run(Thread.java:745)
+	š21:46:29.995 [Test worker] WARN org.apache.kafka.clients.producer.internals.ProducerInterceptors - Error executing interceptor onAcknowledgement callback
+	jorg.apache.kafka.common.KafkaException: Injected exception in AppendProducerInterceptor.onAcknowledgement
+	œ	at test.org.apache.kafka.clients.producer.internals.ProducerInterceptorsTest$AppendProducerInterceptor.onAcknowledgement(ProducerInterceptorsTest.java:77)
+	u	at org.apache.kafka.clients.producer.internals.ProducerInterceptors.onAcknowledgement(ProducerInterceptors.java:88)
+	Œ	at test.org.apache.kafka.clients.producer.internals.ProducerInterceptorsTest.testOnAcknowledgementChain(ProducerInterceptorsTest.java:155)
+	@	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	R	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	Z	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	5	at java.lang.reflect.Method.invoke(Method.java:498)
+	Y	at org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:50)
+	X	at org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:12)
+	W	at org.junit.runners.model.FrameworkMethod.invokeExplosively(FrameworkMethod.java:47)
+	V	at org.junit.internal.runners.statements.InvokeMethod.evaluate(InvokeMethod.java:17)
+	B	at org.junit.runners.ParentRunner.runLeaf(ParentRunner.java:325)
+	V	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:78)
+	V	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:57)
+	@	at org.junit.runners.ParentRunner$3.run(ParentRunner.java:290)
+	D	at org.junit.runners.ParentRunner$1.schedule(ParentRunner.java:71)
+	F	at org.junit.runners.ParentRunner.runChildren(ParentRunner.java:288)
+	D	at org.junit.runners.ParentRunner.access$000(ParentRunner.java:58)
+	E	at org.junit.runners.ParentRunner$2.evaluate(ParentRunner.java:268)
+	>	at org.junit.runners.ParentRunner.run(ParentRunner.java:363)
+	u	at org.gradle.api.internal.tasks.testing.junit.JUnitTestClassExecuter.runTestClass(JUnitTestClassExecuter.java:114)
+	o	at org.gradle.api.internal.tasks.testing.junit.JUnitTestClassExecuter.execute(JUnitTestClassExecuter.java:57)
+	z	at org.gradle.api.internal.tasks.testing.junit.JUnitTestClassProcessor.processTestClass(JUnitTestClassProcessor.java:66)
+	t	at org.gradle.api.internal.tasks.testing.SuiteTestClassProcessor.processTestClass(SuiteTestClassProcessor.java:51)
+	@	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	R	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	Z	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	5	at java.lang.reflect.Method.invoke(Method.java:498)
+	Y	at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:35)
+	Y	at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:24)
+	i	at org.gradle.internal.dispatch.ContextClassLoaderDispatch.dispatch(ContextClassLoaderDispatch.java:32)
+	x	at org.gradle.internal.dispatch.ProxyDispatchAdapter$DispatchingInvocationHandler.invoke(ProxyDispatchAdapter.java:93)
+	;	at com.sun.proxy.$Proxy2.processTestClass(Unknown Source)
+	b	at org.gradle.api.internal.tasks.testing.worker.TestWorker.processTestClass(TestWorker.java:109)
+	@	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	R	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	Z	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	5	at java.lang.reflect.Method.invoke(Method.java:498)
+	Y	at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:35)
+	Y	at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:24)
+	X	at org.gradle.internal.remote.internal.hub.MessageHub$Handler.run(MessageHub.java:377)
+	k	at org.gradle.internal.concurrent.ExecutorPolicy$CatchAndRecordFailures.onExecute(ExecutorPolicy.java:54)
+	^	at org.gradle.internal.concurrent.StoppableExecutorImpl$1.run(StoppableExecutorImpl.java:40)
+	T	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
+	T	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
+	*	at java.lang.Thread.run(Thread.java:745)
+	š21:46:30.000 [Test worker] WARN org.apache.kafka.clients.producer.internals.ProducerInterceptors - Error executing interceptor onAcknowledgement callback
+	jorg.apache.kafka.common.KafkaException: Injected exception in AppendProducerInterceptor.onAcknowledgement
+	œ	at test.org.apache.kafka.clients.producer.internals.ProducerInterceptorsTest$AppendProducerInterceptor.onAcknowledgement(ProducerInterceptorsTest.java:77)
+	u	at org.apache.kafka.clients.producer.internals.ProducerInterceptors.onAcknowledgement(ProducerInterceptors.java:88)
+	Œ	at test.org.apache.kafka.clients.producer.internals.ProducerInterceptorsTest.testOnAcknowledgementChain(ProducerInterceptorsTest.java:155)
+	@	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	R	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	Z	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	5	at java.lang.reflect.Method.invoke(Method.java:498)
+	Y	at org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:50)
+	X	at org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:12)
+	W	at org.junit.runners.model.FrameworkMethod.invokeExplosively(FrameworkMethod.java:47)
+	V	at org.junit.internal.runners.statements.InvokeMethod.evaluate(InvokeMethod.java:17)
+	B	at org.junit.runners.ParentRunner.runLeaf(ParentRunner.java:325)
+	V	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:78)
+	V	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:57)
+	@	at org.junit.runners.ParentRunner$3.run(ParentRunner.java:290)
+	D	at org.junit.runners.ParentRunner$1.schedule(ParentRunner.java:71)
+	F	at org.junit.runners.ParentRunner.runChildren(ParentRunner.java:288)
+	D	at org.junit.runners.ParentRunner.access$000(ParentRunner.java:58)
+	E	at org.junit.runners.ParentRunner$2.evaluate(ParentRunner.java:268)
+	>	at org.junit.runners.ParentRunner.run(ParentRunner.java:363)
+	u	at org.gradle.api.internal.tasks.testing.junit.JUnitTestClassExecuter.runTestClass(JUnitTestClassExecuter.java:114)
+	o	at org.gradle.api.internal.tasks.testing.junit.JUnitTestClassExecuter.execute(JUnitTestClassExecuter.java:57)
+	z	at org.gradle.api.internal.tasks.testing.junit.JUnitTestClassProcessor.processTestClass(JUnitTestClassProcessor.java:66)
+	t	at org.gradle.api.internal.tasks.testing.SuiteTestClassProcessor.processTestClass(SuiteTestClassProcessor.java:51)
+	@	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	R	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	Z	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	5	at java.lang.reflect.Method.invoke(Method.java:498)
+	Y	at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:35)
+	Y	at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:24)
+	i	at org.gradle.internal.dispatch.ContextClassLoaderDispatch.dispatch(ContextClassLoaderDispatch.java:32)
+	x	at org.gradle.internal.dispatch.ProxyDispatchAdapter$DispatchingInvocationHandler.invoke(ProxyDispatchAdapter.java:93)
+	;	at com.sun.proxy.$Proxy2.processTestClass(Unknown Source)
+	b	at org.gradle.api.internal.tasks.testing.worker.TestWorker.processTestClass(TestWorker.java:109)
+	@	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	R	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	Z	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	5	at java.lang.reflect.Method.invoke(Method.java:498)
+	Y	at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:35)
+	Y	at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:24)
+	X	at org.gradle.internal.remote.internal.hub.MessageHub$Handler.run(MessageHub.java:377)
+	k	at org.gradle.internal.concurrent.ExecutorPolicy$CatchAndRecordFailures.onExecute(ExecutorPolicy.java:54)
+	^	at org.gradle.internal.concurrent.StoppableExecutorImpl$1.run(StoppableExecutorImpl.java:40)
+	T	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
+	T	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
+	*	at java.lang.Thread.run(Thread.java:745)
+
+­21:46:30.006 [Test worker] WARN org.apache.kafka.clients.producer.internals.ProducerInterceptors - Error executing interceptor onSend callback for topic: test, partition: 0
+
+_org.apache.kafka.common.KafkaException: Injected exception in AppendProducerInterceptor.onSend
+
+‘	at test.org.apache.kafka.clients.producer.internals.ProducerInterceptorsTest$AppendProducerInterceptor.onSend(ProducerInterceptorsTest.java:56)
+
+j	at org.apache.kafka.clients.producer.internals.ProducerInterceptors.onSend(ProducerInterceptors.java:61)
+
+	at test.org.apache.kafka.clients.producer.internals.ProducerInterceptorsTest.testOnSendChain(ProducerInterceptorsTest.java:121)
+
+@	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+
+R	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+
+Z	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+
+5	at java.lang.reflect.Method.invoke(Method.java:498)
+
+Y	at org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:50)
+
+X	at org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:12)
+
+W	at org.junit.runners.model.FrameworkMethod.invokeExplosively(FrameworkMethod.java:47)
+
+V	at org.junit.internal.runners.statements.InvokeMethod.evaluate(InvokeMethod.java:17)
+
+B	at org.junit.runners.ParentRunner.runLeaf(ParentRunner.java:325)
+
+V	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:78)
+
+V	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:57)
+
+@	at org.junit.runners.ParentRunner$3.run(ParentRunner.java:290)
+
+D	at org.junit.runners.ParentRunner$1.schedule(ParentRunner.java:71)
+
+F	at org.junit.runners.ParentRunner.runChildren(ParentRunner.java:288)
+
+D	at org.junit.runners.ParentRunner.access$000(ParentRunner.java:58)
+
+E	at org.junit.runners.ParentRunner$2.evaluate(ParentRunner.java:268)
+
+>	at org.junit.runners.ParentRunner.run(ParentRunner.java:363)
+
+u	at org.gradle.api.internal.tasks.testing.junit.JUnitTestClassExecuter.runTestClass(JUnitTestClassExecuter.java:114)
+
+o	at org.gradle.api.internal.tasks.testing.junit.JUnitTestClassExecuter.execute(JUnitTestClassExecuter.java:57)
+
+z	at org.gradle.api.internal.tasks.testing.junit.JUnitTestClassProcessor.processTestClass(JUnitTestClassProcessor.java:66)
+
+t	at org.gradle.api.internal.tasks.testing.SuiteTestClassProcessor.processTestClass(SuiteTestClassProcessor.java:51)
+
+@	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+
+R	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+
+Z	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+
+5	at java.lang.reflect.Method.invoke(Method.java:498)
+
+Y	at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:35)
+
+Y	at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:24)
+
+i	at org.gradle.internal.dispatch.ContextClassLoaderDispatch.dispatch(ContextClassLoaderDispatch.java:32)
+
+x	at org.gradle.internal.dispatch.ProxyDispatchAdapter$DispatchingInvocationHandler.invoke(ProxyDispatchAdapter.java:93)
+
+;	at com.sun.proxy.$Proxy2.processTestClass(Unknown Source)
+
+b	at org.gradle.api.internal.tasks.testing.worker.TestWorker.processTestClass(TestWorker.java:109)
+
+@	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+
+R	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+
+Z	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+
+5	at java.lang.reflect.Method.invoke(Method.java:498)
+
+Y	at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:35)
+
+Y	at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:24)
+
+X	at org.gradle.internal.remote.internal.hub.MessageHub$Handler.run(MessageHub.java:377)
+
+k	at org.gradle.internal.concurrent.ExecutorPolicy$CatchAndRecordFailures.onExecute(ExecutorPolicy.java:54)
+
+^	at org.gradle.internal.concurrent.StoppableExecutorImpl$1.run(StoppableExecutorImpl.java:40)
+
+T	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
+
+T	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
+
+*	at java.lang.Thread.run(Thread.java:745)
+
+­21:46:30.019 [Test worker] WARN org.apache.kafka.clients.producer.internals.ProducerInterceptors - Error executing interceptor onSend callback for topic: test, partition: 0
+
+_org.apache.kafka.common.KafkaException: Injected exception in AppendProducerInterceptor.onSend
+
+‘	at test.org.apache.kafka.clients.producer.internals.ProducerInterceptorsTest$AppendProducerInterceptor.onSend(ProducerInterceptorsTest.java:56)
+
+j	at org.apache.kafka.clients.producer.internals.ProducerInterceptors.onSend(ProducerInterceptors.java:61)
+
+	at test.org.apache.kafka.clients.producer.internals.ProducerInterceptorsTest.testOnSendChain(ProducerInterceptorsTest.java:127)
+
+@	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+
+R	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+
+Z	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+
+5	at java.lang.reflect.Method.invoke(Method.java:498)
+
+Y	at org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:50)
+
+X	at org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:12)
+
+W	at org.junit.runners.model.FrameworkMethod.invokeExplosively(FrameworkMethod.java:47)
+
+V	at org.junit.internal.runners.statements.InvokeMethod.evaluate(InvokeMethod.java:17)
+
+B	at org.junit.runners.ParentRunner.runLeaf(ParentRunner.java:325)
+
+V	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:78)
+
+V	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:57)
+
+@	at org.junit.runners.ParentRunner$3.run(ParentRunner.java:290)
+
+D	at org.junit.runners.ParentRunner$1.schedule(ParentRunner.java:71)
+
+F	at org.junit.runners.ParentRunner.runChildren(ParentRunner.java:288)
+
+D	at org.junit.runners.ParentRunner.access$000(ParentRunner.java:58)
+
+E	at org.junit.runners.ParentRunner$2.evaluate(ParentRunner.java:268)
+
+>	at org.junit.runners.ParentRunner.run(ParentRunner.java:363)
+
+u	at org.gradle.api.internal.tasks.testing.junit.JUnitTestClassExecuter.runTestClass(JUnitTestClassExecuter.java:114)
+
+o	at org.gradle.api.internal.tasks.testing.junit.JUnitTestClassExecuter.execute(JUnitTestClassExecuter.java:57)
+
+z	at org.gradle.api.internal.tasks.testing.junit.JUnitTestClassProcessor.processTestClass(JUnitTestClassProcessor.java:66)
+
+t	at org.gradle.api.internal.tasks.testing.SuiteTestClassProcessor.processTestClass(SuiteTestClassProcessor.java:51)
+
+@	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+
+R	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+
+Z	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+
+5	at java.lang.reflect.Method.invoke(Method.java:498)
+
+Y	at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:35)
+
+Y	at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:24)
+
+i	at org.gradle.internal.dispatch.ContextClassLoaderDispatch.dispatch(ContextClassLoaderDispatch.java:32)
+
+x	at org.gradle.internal.dispatch.ProxyDispatchAdapter$DispatchingInvocationHandler.invoke(ProxyDispatchAdapter.java:93)
+
+;	at com.sun.proxy.$Proxy2.processTestClass(Unknown Source)
+
+b	at org.gradle.api.internal.tasks.testing.worker.TestWorker.processTestClass(TestWorker.java:109)
+
+@	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+
+R	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+
+Z	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+
+5	at java.lang.reflect.Method.invoke(Method.java:498)
+
+Y	at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:35)
+
+Y	at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:24)
+
+X	at org.gradle.internal.remote.internal.hub.MessageHub$Handler.run(MessageHub.java:377)
+
+k	at org.gradle.internal.concurrent.ExecutorPolicy$CatchAndRecordFailures.onExecute(ExecutorPolicy.java:54)
+
+^	at org.gradle.internal.concurrent.StoppableExecutorImpl$1.run(StoppableExecutorImpl.java:40)
+
+T	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
+
+T	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
+
+*	at java.lang.Thread.run(Thread.java:745)
+
+­21:46:30.037 [Test worker] WARN org.apache.kafka.clients.producer.internals.ProducerInterceptors - Error executing interceptor onSend callback for topic: test, partition: 0
+
+_org.apache.kafka.common.KafkaException: Injected exception in AppendProducerInterceptor.onSend
+
+‘	at test.org.apache.kafka.clients.producer.internals.ProducerInterceptorsTest$AppendProducerInterceptor.onSend(ProducerInterceptorsTest.java:56)
+
+j	at org.apache.kafka.clients.producer.internals.ProducerInterceptors.onSend(ProducerInterceptors.java:61)
+
+	at test.org.apache.kafka.clients.producer.internals.ProducerInterceptorsTest.testOnSendChain(ProducerInterceptorsTest.java:127)
+
+@	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+
+R	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+
+Z	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+
+5	at java.lang.reflect.Method.invoke(Method.java:498)
+
+Y	at org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:50)
+
+X	at org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:12)
+
+W	at org.junit.runners.model.FrameworkMethod.invokeExplosively(FrameworkMethod.java:47)
+
+V	at org.junit.internal.runners.statements.InvokeMethod.evaluate(InvokeMethod.java:17)
+
+B	at org.junit.runners.ParentRunner.runLeaf(ParentRunner.java:325)
+
+V	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:78)
+
+V	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:57)
+
+@	at org.junit.runners.ParentRunner$3.run(ParentRunner.java:290)
+
+D	at org.junit.runners.ParentRunner$1.schedule(ParentRunner.java:71)
+
+F	at org.junit.runners.ParentRunner.runChildren(ParentRunner.java:288)
+
+D	at org.junit.runners.ParentRunner.access$000(ParentRunner.java:58)
+
+E	at org.junit.runners.ParentRunner$2.evaluate(ParentRunner.java:268)
+
+>	at org.junit.runners.ParentRunner.run(ParentRunner.java:363)
+
+u	at org.gradle.api.internal.tasks.testing.junit.JUnitTestClassExecuter.runTestClass(JUnitTestClassExecuter.java:114)
+
+o	at org.gradle.api.internal.tasks.testing.junit.JUnitTestClassExecuter.execute(JUnitTestClassExecuter.java:57)
+
+z	at org.gradle.api.internal.tasks.testing.junit.JUnitTestClassProcessor.processTestClass(JUnitTestClassProcessor.java:66)
+
+t	at org.gradle.api.internal.tasks.testing.SuiteTestClassProcessor.processTestClass(SuiteTestClassProcessor.java:51)
+
+@	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+
+R	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+
+Z	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+
+5	at java.lang.reflect.Method.invoke(Method.java:498)
+
+Y	at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:35)
+
+Y	at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:24)
+
+i	at org.gradle.internal.dispatch.ContextClassLoaderDispatch.dispatch(ContextClassLoaderDispatch.java:32)
+
+x	at org.gradle.internal.dispatch.ProxyDispatchAdapter$DispatchingInvocationHandler.invoke(ProxyDispatchAdapter.java:93)
+
+;	at com.sun.proxy.$Proxy2.processTestClass(Unknown Source)
+
+b	at org.gradle.api.internal.tasks.testing.worker.TestWorker.processTestClass(TestWorker.java:109)
+
+@	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+
+R	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+
+Z	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+
+5	at java.lang.reflect.Method.invoke(Method.java:498)
+
+Y	at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:35)
+
+Y	at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:24)
+
+X	at org.gradle.internal.remote.internal.hub.MessageHub$Handler.run(MessageHub.java:377)
+
+k	at org.gradle.internal.concurrent.ExecutorPolicy$CatchAndRecordFailures.onExecute(ExecutorPolicy.java:54)
+
+^	at org.gradle.internal.concurrent.StoppableExecutorImpl$1.run(StoppableExecutorImpl.java:40)
+
+T	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
+
+T	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
+
+*	at java.lang.Thread.run(Thread.java:745)
+TestInterceptor.onSend()
+$TestInterceptor.onAcknowledgement()
+testOnError
+$TestInterceptor.onAcknowledgement()
+OnCompletion: /test-0@0
+got Exception: Some error
+testOnSuccess
+$TestInterceptor.onAcknowledgement()
+OnCompletion: /test-0@0
+OnCompletion: testTopic-1@0

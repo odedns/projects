@@ -1,0 +1,43 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:t.layout="urn:import:il.co.menora.soaarchive.client.widgets.layout" xmlns:p="urn:import:com.vaadin.polymer.paper.widget">
+	<ui:with field='res'
+		type='il.co.menora.soaarchive.client.bundle.ClientResources' />
+
+	<g:HTMLPanel>
+	
+	
+	            <p:PaperCard height="auto" width="auto">
+	                    <g:Label ui:field="msgToSendLabel">Messages to send: </g:Label>
+						<g:HorizontalPanel spacing="20">
+                         <g:VerticalPanel>
+                         	<p:PaperCheckbox ui:field="useQM">Use Default Queue Manager</p:PaperCheckbox>
+                         	<p:PaperInput label="Queue Manager" ui:field="queueMgr" value=""/>
+                         	 <p:PaperInput label="Reply To Queue" ui:field="replyToQueue"/>
+                         	 <p:PaperInput label="Validity Date" ui:field="validDate"/>
+                         	 
+                           </g:VerticalPanel>
+                           <g:VerticalPanel>	
+                             <p:PaperCheckbox ui:field="useQueue">Use Default Queue</p:PaperCheckbox>
+                         	 <p:PaperInput label="Queue Name" ui:field="queueName" value=""/>                              
+                              <p:PaperInput label="Priority" ui:field="priority"/>
+                         	 <p:PaperCheckbox ui:field="createNew">Create New Message Id</p:PaperCheckbox>
+                      	    </g:VerticalPanel>	
+                      	 
+                         </g:HorizontalPanel>	
+                   </p:PaperCard>
+                   
+                   <g:HorizontalPanel spacing="20">
+                   <p:PaperButton attributes="dialog-confirm autofocus" class="loginButton" ui:field="resendButton">Resend</p:PaperButton>
+                   <p:PaperButton attributes="dialog-confirm autofocus" class="loginButton">Close</p:PaperButton>
+                   </g:HorizontalPanel> 
+                   
+                 
+                   
+                    <p:PaperDialog ui:field="progDlg" >
+                		<p align="center">Please Wait ....</p>
+               			<p:PaperProgress indeterminate="true"/>
+               			<br/>
+                	</p:PaperDialog>
+    </g:HTMLPanel>              
+</ui:UiBinder> 

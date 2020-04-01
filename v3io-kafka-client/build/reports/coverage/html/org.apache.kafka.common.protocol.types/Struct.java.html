@@ -1,0 +1,361 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>Struct.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">v3io-kafka-client</a> &gt; <a href="index.source.html" class="el_package">org.apache.kafka.common.protocol.types</a> &gt; <span class="el_source">Struct.java</span></div><h1>Struct.java</h1><pre class="source lang-java linenums">/**
+ * Licensed to the Apache Software Foundation (ASF) under one or more contributor license agreements. See the NOTICE
+ * file distributed with this work for additional information regarding copyright ownership. The ASF licenses this file
+ * to You under the Apache License, Version 2.0 (the &quot;License&quot;); you may not use this file except in compliance with the
+ * License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+ * an &quot;AS IS&quot; BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
+ */
+package org.apache.kafka.common.protocol.types;
+
+import java.nio.ByteBuffer;
+import java.util.Arrays;
+
+/**
+ * A record that can be serialized and deserialized according to a pre-defined schema
+ */
+public class Struct {
+    private final Schema schema;
+    private final Object[] values;
+
+<span class="nc" id="L25">    Struct(Schema schema, Object[] values) {</span>
+<span class="nc" id="L26">        this.schema = schema;</span>
+<span class="nc" id="L27">        this.values = values;</span>
+<span class="nc" id="L28">    }</span>
+
+<span class="nc" id="L30">    public Struct(Schema schema) {</span>
+<span class="nc" id="L31">        this.schema = schema;</span>
+<span class="nc" id="L32">        this.values = new Object[this.schema.numFields()];</span>
+<span class="nc" id="L33">    }</span>
+
+    /**
+     * The schema for this struct.
+     */
+    public Schema schema() {
+<span class="nc" id="L39">        return this.schema;</span>
+    }
+
+    /**
+     * Return the value of the given pre-validated field, or if the value is missing return the default value.
+     *
+     * @param field The field for which to get the default value
+     * @throws SchemaException if the field has no value and has no default.
+     */
+    private Object getFieldOrDefault(Field field) {
+<span class="nc" id="L49">        Object value = this.values[field.index];</span>
+<span class="nc bnc" id="L50" title="All 2 branches missed.">        if (value != null)</span>
+<span class="nc" id="L51">            return value;</span>
+<span class="nc bnc" id="L52" title="All 2 branches missed.">        else if (field.defaultValue != Field.NO_DEFAULT)</span>
+<span class="nc" id="L53">            return field.defaultValue;</span>
+<span class="nc bnc" id="L54" title="All 2 branches missed.">        else if (field.type.isNullable())</span>
+<span class="nc" id="L55">            return null;</span>
+        else
+<span class="nc" id="L57">            throw new SchemaException(&quot;Missing value for field '&quot; + field.name + &quot;' which has no default value.&quot;);</span>
+    }
+
+    /**
+     * Get the value for the field directly by the field index with no lookup needed (faster!)
+     *
+     * @param field The field to look up
+     * @return The value for that field.
+     * @throws SchemaException if the field has no value and has no default.
+     */
+    public Object get(Field field) {
+<span class="nc" id="L68">        validateField(field);</span>
+<span class="nc" id="L69">        return getFieldOrDefault(field);</span>
+    }
+
+    /**
+     * Get the record value for the field with the given name by doing a hash table lookup (slower!)
+     *
+     * @param name The name of the field
+     * @return The value in the record
+     * @throws SchemaException If no such field exists
+     */
+    public Object get(String name) {
+<span class="nc" id="L80">        Field field = schema.get(name);</span>
+<span class="nc bnc" id="L81" title="All 2 branches missed.">        if (field == null)</span>
+<span class="nc" id="L82">            throw new SchemaException(&quot;No such field: &quot; + name);</span>
+<span class="nc" id="L83">        return getFieldOrDefault(field);</span>
+    }
+
+    /**
+     * Check if the struct contains a field.
+     * @param name
+     * @return Whether a field exists.
+     */
+    public boolean hasField(String name) {
+<span class="nc bnc" id="L92" title="All 2 branches missed.">        return schema.get(name) != null;</span>
+    }
+
+    public Struct getStruct(Field field) {
+<span class="nc" id="L96">        return (Struct) get(field);</span>
+    }
+
+    public Struct getStruct(String name) {
+<span class="nc" id="L100">        return (Struct) get(name);</span>
+    }
+
+    public Byte getByte(Field field) {
+<span class="nc" id="L104">        return (Byte) get(field);</span>
+    }
+
+    public byte getByte(String name) {
+<span class="nc" id="L108">        return (Byte) get(name);</span>
+    }
+
+    public Short getShort(Field field) {
+<span class="nc" id="L112">        return (Short) get(field);</span>
+    }
+
+    public Short getShort(String name) {
+<span class="nc" id="L116">        return (Short) get(name);</span>
+    }
+
+    public Integer getInt(Field field) {
+<span class="nc" id="L120">        return (Integer) get(field);</span>
+    }
+
+    public Integer getInt(String name) {
+<span class="nc" id="L124">        return (Integer) get(name);</span>
+    }
+
+    public Long getLong(Field field) {
+<span class="nc" id="L128">        return (Long) get(field);</span>
+    }
+
+    public Long getLong(String name) {
+<span class="nc" id="L132">        return (Long) get(name);</span>
+    }
+
+    public Object[] getArray(Field field) {
+<span class="nc" id="L136">        return (Object[]) get(field);</span>
+    }
+
+    public Object[] getArray(String name) {
+<span class="nc" id="L140">        return (Object[]) get(name);</span>
+    }
+
+    public String getString(Field field) {
+<span class="nc" id="L144">        return (String) get(field);</span>
+    }
+
+    public String getString(String name) {
+<span class="nc" id="L148">        return (String) get(name);</span>
+    }
+
+    public Boolean getBoolean(Field field) {
+<span class="nc" id="L152">        return (Boolean) get(field);</span>
+    }
+
+    public Boolean getBoolean(String name) {
+<span class="nc" id="L156">        return (Boolean) get(name);</span>
+    }
+
+    public ByteBuffer getBytes(Field field) {
+<span class="nc" id="L160">        Object result = get(field);</span>
+<span class="nc bnc" id="L161" title="All 2 branches missed.">        if (result instanceof byte[])</span>
+<span class="nc" id="L162">            return ByteBuffer.wrap((byte[]) result);</span>
+<span class="nc" id="L163">        return (ByteBuffer) result;</span>
+    }
+
+    public ByteBuffer getBytes(String name) {
+<span class="nc" id="L167">        Object result = get(name);</span>
+<span class="nc bnc" id="L168" title="All 2 branches missed.">        if (result instanceof byte[])</span>
+<span class="nc" id="L169">            return ByteBuffer.wrap((byte[]) result);</span>
+<span class="nc" id="L170">        return (ByteBuffer) result;</span>
+    }
+
+    /**
+     * Set the given field to the specified value
+     *
+     * @param field The field
+     * @param value The value
+     * @throws SchemaException If the validation of the field failed
+     */
+    public Struct set(Field field, Object value) {
+<span class="nc" id="L181">        validateField(field);</span>
+<span class="nc" id="L182">        this.values[field.index] = value;</span>
+<span class="nc" id="L183">        return this;</span>
+    }
+
+    /**
+     * Set the field specified by the given name to the value
+     *
+     * @param name The name of the field
+     * @param value The value to set
+     * @throws SchemaException If the field is not known
+     */
+    public Struct set(String name, Object value) {
+<span class="nc" id="L194">        Field field = this.schema.get(name);</span>
+<span class="nc bnc" id="L195" title="All 2 branches missed.">        if (field == null)</span>
+<span class="nc" id="L196">            throw new SchemaException(&quot;Unknown field: &quot; + name);</span>
+<span class="nc" id="L197">        this.values[field.index] = value;</span>
+<span class="nc" id="L198">        return this;</span>
+    }
+
+    /**
+     * Create a struct for the schema of a container type (struct or array). Note that for array type, this method
+     * assumes that the type is an array of schema and creates a struct of that schema. Arrays of other types can't be
+     * instantiated with this method.
+     *
+     * @param field The field to create an instance of
+     * @return The struct
+     * @throws SchemaException If the given field is not a container type
+     */
+    public Struct instance(Field field) {
+<span class="nc" id="L211">        validateField(field);</span>
+<span class="nc bnc" id="L212" title="All 2 branches missed.">        if (field.type() instanceof Schema) {</span>
+<span class="nc" id="L213">            return new Struct((Schema) field.type());</span>
+<span class="nc bnc" id="L214" title="All 2 branches missed.">        } else if (field.type() instanceof ArrayOf) {</span>
+<span class="nc" id="L215">            ArrayOf array = (ArrayOf) field.type();</span>
+<span class="nc" id="L216">            return new Struct((Schema) array.type());</span>
+        } else {
+<span class="nc" id="L218">            throw new SchemaException(&quot;Field '&quot; + field.name + &quot;' is not a container type, it is of type &quot; + field.type());</span>
+        }
+    }
+
+    /**
+     * Create a struct instance for the given field which must be a container type (struct or array)
+     *
+     * @param field The name of the field to create (field must be a schema type)
+     * @return The struct
+     * @throws SchemaException If the given field is not a container type
+     */
+    public Struct instance(String field) {
+<span class="nc" id="L230">        return instance(schema.get(field));</span>
+    }
+
+    /**
+     * Empty all the values from this record
+     */
+    public void clear() {
+<span class="nc" id="L237">        Arrays.fill(this.values, null);</span>
+<span class="nc" id="L238">    }</span>
+
+    /**
+     * Get the serialized size of this object
+     */
+    public int sizeOf() {
+<span class="nc" id="L244">        return this.schema.sizeOf(this);</span>
+    }
+
+    /**
+     * Write this struct to a buffer
+     */
+    public void writeTo(ByteBuffer buffer) {
+<span class="nc" id="L251">        this.schema.write(buffer, this);</span>
+<span class="nc" id="L252">    }</span>
+
+    /**
+     * Ensure the user doesn't try to access fields from the wrong schema
+     *
+     * @throws SchemaException If validation fails
+     */
+    private void validateField(Field field) {
+<span class="nc bnc" id="L260" title="All 2 branches missed.">        if (this.schema != field.schema)</span>
+<span class="nc" id="L261">            throw new SchemaException(&quot;Attempt to access field '&quot; + field.name + &quot;' from a different schema instance.&quot;);</span>
+<span class="nc bnc" id="L262" title="All 2 branches missed.">        if (field.index &gt; values.length)</span>
+<span class="nc" id="L263">            throw new SchemaException(&quot;Invalid field index: &quot; + field.index);</span>
+<span class="nc" id="L264">    }</span>
+
+    /**
+     * Validate the contents of this struct against its schema
+     *
+     * @throws SchemaException If validation fails
+     */
+    public void validate() {
+<span class="nc" id="L272">        this.schema.validate(this);</span>
+<span class="nc" id="L273">    }</span>
+
+    /**
+     * Create a byte buffer containing the serialized form of the values in this struct. This method can choose to break
+     * the struct into multiple ByteBuffers if need be.
+     */
+    public ByteBuffer[] toBytes() {
+<span class="nc" id="L280">        ByteBuffer buffer = ByteBuffer.allocate(sizeOf());</span>
+<span class="nc" id="L281">        writeTo(buffer);</span>
+<span class="nc" id="L282">        return new ByteBuffer[] {buffer};</span>
+    }
+
+    @Override
+    public String toString() {
+<span class="nc" id="L287">        StringBuilder b = new StringBuilder();</span>
+<span class="nc" id="L288">        b.append('{');</span>
+<span class="nc bnc" id="L289" title="All 2 branches missed.">        for (int i = 0; i &lt; this.values.length; i++) {</span>
+<span class="nc" id="L290">            Field f = this.schema.get(i);</span>
+<span class="nc" id="L291">            b.append(f.name);</span>
+<span class="nc" id="L292">            b.append('=');</span>
+<span class="nc bnc" id="L293" title="All 4 branches missed.">            if (f.type() instanceof ArrayOf &amp;&amp; this.values[i] != null) {</span>
+<span class="nc" id="L294">                Object[] arrayValue = (Object[]) this.values[i];</span>
+<span class="nc" id="L295">                b.append('[');</span>
+<span class="nc bnc" id="L296" title="All 2 branches missed.">                for (int j = 0; j &lt; arrayValue.length; j++) {</span>
+<span class="nc" id="L297">                    b.append(arrayValue[j]);</span>
+<span class="nc bnc" id="L298" title="All 2 branches missed.">                    if (j &lt; arrayValue.length - 1)</span>
+<span class="nc" id="L299">                        b.append(',');</span>
+                }
+<span class="nc" id="L301">                b.append(']');</span>
+<span class="nc" id="L302">            } else</span>
+<span class="nc" id="L303">                b.append(this.values[i]);</span>
+<span class="nc bnc" id="L304" title="All 2 branches missed.">            if (i &lt; this.values.length - 1)</span>
+<span class="nc" id="L305">                b.append(',');</span>
+        }
+<span class="nc" id="L307">        b.append('}');</span>
+<span class="nc" id="L308">        return b.toString();</span>
+    }
+
+    @Override
+    public int hashCode() {
+<span class="nc" id="L313">        final int prime = 31;</span>
+<span class="nc" id="L314">        int result = 1;</span>
+<span class="nc bnc" id="L315" title="All 2 branches missed.">        for (int i = 0; i &lt; this.values.length; i++) {</span>
+<span class="nc" id="L316">            Field f = this.schema.get(i);</span>
+<span class="nc bnc" id="L317" title="All 2 branches missed.">            if (f.type() instanceof ArrayOf) {</span>
+<span class="nc bnc" id="L318" title="All 2 branches missed.">                if (this.get(f) != null) {</span>
+<span class="nc" id="L319">                    Object[] arrayObject = (Object []) this.get(f);</span>
+<span class="nc bnc" id="L320" title="All 2 branches missed.">                    for (Object arrayItem: arrayObject)</span>
+<span class="nc" id="L321">                        result = prime * result + arrayItem.hashCode();</span>
+<span class="nc" id="L322">                }</span>
+            } else {
+<span class="nc" id="L324">                Object field = this.get(f);</span>
+<span class="nc bnc" id="L325" title="All 2 branches missed.">                if (field != null) {</span>
+<span class="nc" id="L326">                    result = prime * result + field.hashCode();</span>
+                }
+            }
+        }
+<span class="nc" id="L330">        return result;</span>
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+<span class="nc bnc" id="L335" title="All 2 branches missed.">        if (this == obj)</span>
+<span class="nc" id="L336">            return true;</span>
+<span class="nc bnc" id="L337" title="All 2 branches missed.">        if (obj == null)</span>
+<span class="nc" id="L338">            return false;</span>
+<span class="nc bnc" id="L339" title="All 2 branches missed.">        if (getClass() != obj.getClass())</span>
+<span class="nc" id="L340">            return false;</span>
+<span class="nc" id="L341">        Struct other = (Struct) obj;</span>
+<span class="nc bnc" id="L342" title="All 2 branches missed.">        if (schema != other.schema)</span>
+<span class="nc" id="L343">            return false;</span>
+<span class="nc bnc" id="L344" title="All 2 branches missed.">        for (int i = 0; i &lt; this.values.length; i++) {</span>
+<span class="nc" id="L345">            Field f = this.schema.get(i);</span>
+            boolean result;
+<span class="nc bnc" id="L347" title="All 2 branches missed.">            if (f.type() instanceof ArrayOf) {</span>
+<span class="nc" id="L348">                result = Arrays.equals((Object[]) this.get(f), (Object[]) other.get(f));</span>
+            } else {
+<span class="nc" id="L350">                Object thisField = this.get(f);</span>
+<span class="nc" id="L351">                Object otherField = other.get(f);</span>
+<span class="nc bnc" id="L352" title="All 6 branches missed.">                result = (thisField == null &amp;&amp; otherField == null) || thisField.equals(otherField);</span>
+            }
+<span class="nc bnc" id="L354" title="All 2 branches missed.">            if (!result)</span>
+<span class="nc" id="L355">                return false;</span>
+        }
+<span class="nc" id="L357">        return true;</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.6.201602180812</span></div></body></html>

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd" id="WebApp_ID" version="3.0">
+  <display-name>SoaArchiveWeb</display-name>
+  <welcome-file-list>
+    <welcome-file>index.jsp</welcome-file>
+  </welcome-file-list>
+  <session-config>
+    <session-timeout>30</session-timeout>
+  </session-config>
+  <error-page>
+    <error-code>403</error-code>
+    <location>/error403.jsp</location>
+  </error-page>
+  <error-page>
+    <error-code>400</error-code>
+    <location>/loginError.jsp?errorCode=invalidLoginSession</location>
+  </error-page>
+  <error-page>
+    <error-code>408</error-code>
+    <location>/loginError.jsp?errorCode=invalidLoginSession</location>
+  </error-page>
+  <security-role>
+    <role-name>BpmPortalUserRole</role-name>
+  </security-role>
+  <security-role>
+    <role-name>BpmPortalAdminRole</role-name>
+  </security-role>
+  <security-constraint>
+    <web-resource-collection>
+      <web-resource-name>Protected Pages</web-resource-name>
+      <url-pattern>/*</url-pattern>
+    </web-resource-collection>
+    <auth-constraint>
+      <role-name>BpmPortalUserRole</role-name>
+      <role-name>BpmPortalAdminRole</role-name>
+    </auth-constraint>
+  </security-constraint>
+  <security-constraint>
+    <web-resource-collection>
+      <web-resource-name>Unprotected Pages</web-resource-name>
+      <url-pattern>/login.jsp</url-pattern>
+      <url-pattern>/logout.jsp</url-pattern>
+      <url-pattern>/shared-styles.html</url-pattern>
+      <url-pattern>/images/*</url-pattern>
+      <url-pattern>/jquery-1.11.2/*</url-pattern>
+      <url-pattern>/fontawesome-4.3.0/*</url-pattern>
+      <url-pattern>/SoaArchiveClient/bower_components/*</url-pattern>
+      <url-pattern>/test</url-pattern>
+      <url-pattern>/mq</url-pattern>
+      <url-pattern>/rest/*</url-pattern>
+      
+    </web-resource-collection>
+  </security-constraint>
+  <login-config>
+    <auth-method>FORM</auth-method>
+    <form-login-config>
+      <form-login-page>/login.jsp</form-login-page>
+      <form-error-page>/loginError.jsp?errorCode=invalidCredentials</form-error-page>
+    </form-login-config>
+  </login-config>
+  
+  <!-- for testing ejb -->
+  <servlet>
+	<servlet-name>TestServlet</servlet-name>
+	<servlet-class>test.TestServlet</servlet-class>  
+  </servlet>
+  <servlet-mapping>
+  	<servlet-name>TestServlet</servlet-name>
+  	<url-pattern>/test</url-pattern>
+  </servlet-mapping>
+ 
+  
+  
+</web-app>

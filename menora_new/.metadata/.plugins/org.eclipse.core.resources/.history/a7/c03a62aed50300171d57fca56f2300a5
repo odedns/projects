@@ -1,0 +1,865 @@
+package il.co.menora.soaarchive.client.widgets.layout;
+
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.LinkedList;
+
+import org.fusesource.restygwt.client.JsonCallback;
+import org.fusesource.restygwt.client.JsonEncoderDecoder;
+import org.fusesource.restygwt.client.Method;
+import org.fusesource.restygwt.client.Resource;
+import org.fusesource.restygwt.client.TextCallback;
+
+import com.gargoylesoftware.htmlunit.javascript.host.Console;
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.core.client.JsArrayString;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.i18n.client.DateTimeFormat;
+import com.google.gwt.json.client.JSONArray;
+import com.google.gwt.json.client.JSONObject;
+import com.google.gwt.json.client.JSONString;
+import com.google.gwt.json.client.JSONValue;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.datepicker.client.DatePicker;
+import com.vaadin.polymer.paper.widget.PaperButton;
+import com.vaadin.polymer.paper.widget.PaperCheckbox;
+import com.vaadin.polymer.paper.widget.PaperDialog;
+import com.vaadin.polymer.paper.widget.PaperInput;
+
+import il.co.menora.soaarchive.client.events.ClientEventBus;
+import il.co.menora.soaarchive.client.events.ReloadDataEvent;
+import il.co.menora.soaarchive.client.events.ReloadDataEvent.ReloadDataEventHandler;
+import il.co.menora.soaarchive.client.places.ClientPlaceController;
+import il.co.menora.soaarchive.client.places.OutgoingPlace;
+import il.co.menora.soaarchive.shared.SOAServiceType;
+import il.co.menora.soaarchive.shared.SearchDto;
+import il.co.menora.soaarchive.shared.StatusDto;
+import il.co.menora.soaarchive.shared.Statuses;
+
+public class DataTablePage extends Composite {
+	 
+	interface MyDataTableUiBinder extends UiBinder<HTMLPanel, DataTablePage> {
+    }
+ 
+	interface StatusDtoCodec extends JsonEncoderDecoder<StatusDto> {}
+
+	private static StatusDtoCodec statusCodec = GWT.create(StatusDtoCodec.class);
+	
+	interface SearchDtoCodec extends JsonEncoderDecoder<SearchDto> {}
+
+	private static SearchDtoCodec searchCodec = GWT.create(SearchDtoCodec.class);
+	
+	
+	public static final String DATE_PATTERN = "dd/MM/yyyy HH:mm:ss";
+	private static MyDataTableUiBinder myUiBinder = GWT.create(MyDataTableUiBinder.class);
+	
+	@UiField
+	PaperButton searchButton;
+	@UiField
+	PaperButton clearButton;
+	
+	@UiField
+	PaperInput fromDateInput;
+	@UiField
+	PaperInput toDateInput;
+	
+	@UiField
+	PaperInput serviceNameInput;
+	
+	@UiField
+	PaperCheckbox newCheckBox;
+	@UiField
+	PaperCheckbox cmCheckBox;
+	@UiField
+	PaperCheckbox omCheckBox;
+	@UiField
+	PaperCheckbox rrCheckBox;
+	@UiField
+	PaperCheckbox rrbCheckBox;
+	@UiField
+	PaperCheckbox iibCheckBox;
+	@UiField
+	PaperCheckbox dpCheckBox;
+	@UiField
+	PaperCheckbox expiredCheckBox;
+	@UiField
+	PaperDialog modalDlg;
+	@UiField
+	HTMLPanel dialogPanel;
+	@UiField
+	PaperDialog progDlg;
+	@UiField
+	PaperButton outgoingButton;
+	@UiField
+	PaperButton sendButton;
+    @UiField
+    Label rowsLabel;
+    @UiField
+	PaperButton closeStatusButton;
+    @UiField
+   	PaperButton openStatusButton;
+   
+    
+    private JSONValue searchRequest = null;
+    
+	private boolean attached = false;
+	
+	 public DataTablePage()
+	 {
+	        initWidget(myUiBinder.createAndBindUi(this));
+	      
+	 }
+	 
+	 
+	 private void reload() {
+			GWT.log("in reload..");
+			destroyTable();
+			initTable();
+		}
+		 
+		
+		 @Override
+			protected void onLoad() {
+				ClientEventBus.registerEventHandlerOnLoad(this, ReloadDataEvent.TYPE, new ReloadDataEventHandler() {
+					@Override
+					public void onEvent(ReloadDataEvent event) {
+						reload();
+					}
+				});
+			}
+
+			@Override
+			protected void onUnload() {
+				ClientEventBus.removeEventHandlersOnUnload(this);
+			}
+		 
+		
+	@UiHandler("closeStatusButton")
+	void handleCloseStatusButton(ClickEvent e)
+	{
+		GWT.log("closeStatusButton clicked..");
+		updateStatus(StatusDto.CLOSED_MANUALLY,false);
+	}
+	
+	@UiHandler("openStatusButton")
+	void handleOpenStatusButton(ClickEvent e)
+	{
+		GWT.log("openStatusButton clicked..");
+		updateStatus(StatusDto.OPENED_MANUALLY,false);
+
+	}
+	
+		
+	/**
+	 * call the webservice to update the row status.
+	 * @param status
+	 */
+	public void updateStatus(String status, boolean all)
+	{
+		 
+		 LinkedList<String> ids = new LinkedList<String>();
+		 StatusDto dto = new StatusDto();
+
+		 
+		 
+		 if(!all) {
+			 JavaScriptObject o = selectedRows();
+			 JsArrayString sArrary =  o.cast();
+			 for(int i=0; i < sArrary.length(); ++i) {
+				 ids.add(sArrary.get(i));
+			 
+			 }
+			 if(ids.size() < 1) {
+				 Window.alert("No messages selected.");
+				 return;
+			 }
+			 
+			 dto.setIds(ids);
+		 } else {
+			 // update all retrieved messages
+			 SearchDto searchDto = createSearchDto();
+			 dto.setSearchDto(searchDto);
+			 
+		 }
+		 dto.setStatus(status);	
+		 progDlg.open();
+		 Resource resource = new Resource("/archive/rest/soaarchive/status");
+		 JSONValue request = statusCodec.encode(dto);
+
+			resource.post().json(request).send(new JsonCallback() {
+					
+					@Override
+					public void onSuccess(Method method, JSONValue response) {
+						// TODO Auto-generated method stub
+						progDlg.close();
+						String shortStatus = StatusDto.cvtStatus(status);
+						if(ids.size() > 20 || all ) {
+							handleSearchButtonClick(null);
+						} else { 
+							updateRows(shortStatus);
+						}
+						
+					}
+					
+					@Override
+					public void onFailure(Method method, Throwable exception) {
+						// TODO Auto-generated method stub
+						GWT.log("error = " + exception);
+						progDlg.close();
+						Window.alert("Error: " + exception);
+					}
+				});
+
+			  
+		 
+		
+		
+	}
+	
+	 public native void updateRows(String status) /*-{
+	   	var rows_selected = $wnd.table.column(0).checkboxes.selected();
+	  	console.log("called updatrRows row= " + rows_selected);
+    	$wnd.table.rows().every( function ( rowIdx, tableLoop, rowLoop ) {   		
+ 			var data = this.data();
+ 			var res = $wnd.$.inArray(data.id,rows_selected);
+ 			if(res > -1) {
+ 		 		console.log("match : " + rowIdx + " status = " + data[3] + " new status: " + status);
+ 		 		$wnd.table.cell(rowIdx,3).data(status).draw();
+ 		 	
+ 			}
+		} ); 
+    
+
+	 }-*/;
+	
+	
+	@UiHandler("clearButton")
+	void handleClearButton(ClickEvent e)
+	{
+		fromDateInput.setValue("");
+		toDateInput.setValue("");
+		serviceNameInput.setValue("");
+		newCheckBox.setChecked(false);
+		rrCheckBox.setChecked(false);
+		cmCheckBox.setChecked(false);
+		omCheckBox.setChecked(false);
+		rrbCheckBox.setChecked(false);
+		dpCheckBox.setChecked(false);
+		iibCheckBox.setChecked(false);
+		expiredCheckBox.setChecked(false);
+
+	}
+	 
+	
+	
+	private SearchDto createSearchDto()
+	{
+		SearchDto dto = new SearchDto();
+		 
+		 String fromValue = null;
+		 String toValue = null;
+		 String serviceName = serviceNameInput.getValue();
+		 fromValue = fromDateInput.getValue();		
+		 toValue = toDateInput.getValue();
+		 
+		 dto.setFromDate(fromValue);
+		 dto.setToDate(toValue);
+		 dto.setServiceName(serviceName);
+		 ArrayList<String> statuses = new ArrayList<String>();
+		if(newCheckBox.getChecked()) {
+			statuses.add(Statuses.STATUS_NEW);
+		}
+		if(rrCheckBox.getChecked()) {
+			statuses.add(Statuses.STATUS_RR);
+
+		}
+		if(rrbCheckBox.getChecked()) {
+			statuses.add(Statuses.STATUS_BFRR);
+		}
+		if(cmCheckBox.getChecked()) {
+			statuses.add(Statuses.STATUS_CM);
+
+		}
+		if(cmCheckBox.getChecked()) {
+			statuses.add(Statuses.STATUS_OM);
+		}
+		dto.setStatuses(statuses);
+		
+		ArrayList<String> serviceTypes = new ArrayList<String>();
+		if(dpCheckBox.getChecked()) {
+			serviceTypes.add(SOAServiceType.TYPE_DP);
+		}
+		if(iibCheckBox.getChecked()) {
+			serviceTypes.add(SOAServiceType.TYPE_IIB);
+		}
+		dto.setServiceTypes(serviceTypes);
+		if(expiredCheckBox.getChecked()) {
+			dto.setShowInvalid(true);
+		} else {
+			dto.setShowInvalid(false);
+		}
+		
+		return(dto);
+		
+	}
+	
+	 @UiHandler("searchButton")
+	 void handleSearchButtonClick(ClickEvent e) {
+		 Date fromDate=null;
+		 Date toDate=null;
+		 String fromValue = null;
+		 String toValue = null;
+		 GWT.log("searchbutton clicked...");
+		 String serviceName = serviceNameInput.getValue();
+		 fromValue = fromDateInput.getValue();
+		 if(fromValue != null && fromValue.length() > 0) {
+			 try {
+				 fromDate = DateTimeFormat.getFormat(DATE_PATTERN).parse(fromValue);
+			 } catch(Exception e1) {
+				 Window.alert("Error in date field.");
+				 return;
+			 }
+		 }
+		 toValue = toDateInput.getValue();
+		 if(toValue != null && toValue.length() > 0) {
+			 try {
+				 toDate = DateTimeFormat.getFormat(DATE_PATTERN).parse(toValue);
+			 } catch(Exception e1) {
+				 Window.alert("Error in date field.");
+				 return;
+			 }
+		 }
+		JSONArray array = new JSONArray();
+		int i=0;
+		if(newCheckBox.getChecked()) {
+			array.set(i++, new JSONString(Statuses.STATUS_NEW));
+
+		}
+		if(rrCheckBox.getChecked()) {
+			array.set(i++, new JSONString(Statuses.STATUS_RR));
+
+		}
+		if(rrbCheckBox.getChecked()) {
+			array.set(i++, new JSONString(Statuses.STATUS_BFRR));
+		}
+		if(cmCheckBox.getChecked()) {
+			array.set(i++, new JSONString(Statuses.STATUS_CM));
+
+		}
+		if(omCheckBox.getChecked()) {
+			array.set(i++, new JSONString(Statuses.STATUS_OM));
+
+		}
+		JSONArray typeArray = new JSONArray();
+		int j=0;
+		if(dpCheckBox.getChecked()) {
+			typeArray.set(j++, new JSONString(SOAServiceType.TYPE_DP));
+		}
+		if(iibCheckBox.getChecked()) {
+			typeArray.set(j++, new JSONString(SOAServiceType.TYPE_IIB));
+
+		}
+		Resource resource = new Resource("/archive/rest/soaarchive/incoming");
+		JSONObject request = new JSONObject();
+		request.put("serviceName", new JSONString(serviceName));
+		request.put("fromDate", new JSONString(fromValue));
+		request.put("toDate", new JSONString(toValue));
+		request.put("statuses",array);
+		request.put("serviceTypes", typeArray);
+		if(expiredCheckBox.getChecked()) {
+			request.put("showInvalid",  new JSONString("true"));
+		}
+		 progDlg.open();
+		 searchRequest = request;
+		resource.post().json(request).send(new JsonCallback() {
+				
+				@Override
+				public void onSuccess(Method method, JSONValue response) {
+					// TODO Auto-generated method stub
+					progDlg.close();
+					String data = response.toString();
+					displayRowCounts(response);
+					clearSelected();
+					updateData(data);
+
+				}
+				
+				@Override
+				public void onFailure(Method method, Throwable exception) {
+					// TODO Auto-generated method stub
+					GWT.log("error = " + exception);
+					progDlg.close();
+					Window.alert("Error: " + exception);
+
+
+				}
+			});
+
+		  
+	 }
+
+	
+		 @UiHandler("fromDateInput")
+		 void handleDateInputClick(ClickEvent e) {
+			 GWT.log("date input clicked");
+			 
+			 int left = fromDateInput.getAbsoluteLeft();
+			 int top = fromDateInput.getAbsoluteTop();
+			 ClosablePopup popup = new ClosablePopup();
+			 popup.setAutoHideEnabled(true);
+			  popup.setPopupPosition(left, top+60);
+			 DatePicker dp = new DatePicker();
+			 dp.addValueChangeHandler(new ValueChangeHandler<Date>() {
+				
+				@Override
+				public void onValueChange(ValueChangeEvent<Date> event) {
+					// TODO Auto-generated method stub
+					popup.hide();
+					Date date = event.getValue();
+					String s = DateTimeFormat.getFormat(DATE_PATTERN).format(date);
+					fromDateInput.setValue(s);
+				}
+			});
+			 
+			 popup.add(dp);
+			 popup.show();
+			 
+		 }
+		
+		 @UiHandler("toDateInput")
+		 void handleToDateInputClick(ClickEvent e) {
+			 GWT.log("date input clicked");
+			 
+			 int left = toDateInput.getAbsoluteLeft();
+			 int top = toDateInput.getAbsoluteTop();
+			 ClosablePopup popup = new ClosablePopup();
+			 popup.setAutoHideEnabled(true);
+			 popup.setPopupPosition(left, top+60);
+			  
+			  
+			 DatePicker dp = new DatePicker();
+			 
+			 dp.addValueChangeHandler(new ValueChangeHandler<Date>() {
+				
+				@Override
+				public void onValueChange(ValueChangeEvent<Date> event) {
+					// TODO Auto-generated method stub
+					popup.hide();
+					Date date = event.getValue();
+					String s = DateTimeFormat.getFormat(DATE_PATTERN).format(date);
+					toDateInput.setValue(s);
+					
+				}
+			});
+			 popup.add(dp);
+			 popup.show();
+			 
+		 }
+
+	  
+	 @UiHandler("sendButton")
+	 void handleSendButton(ClickEvent e)
+	 {
+		 GWT.log("in handleSendButton....");
+		 JavaScriptObject o = selectedRows();
+		 LinkedList<String> ids = new LinkedList<String>();
+		 JsArrayString sArrary =  o.cast();
+		 for(int i=0; i < sArrary.length(); ++i) {
+			 ids.add(sArrary.get(i));
+			 
+		 }
+		 if(ids.size()> 0) {
+			 SendPanel sendPanel = new SendPanel();
+			 sendPanel.setIds(ids);
+			 dialogPanel.clear();
+			 dialogPanel.add(sendPanel);
+			 modalDlg.setModal(false);
+			 modalDlg.open();
+		 } else {
+			 Window.alert("No messages selected");
+		 }
+	 }
+	
+	 
+	 
+	 @UiHandler("outgoingButton")
+	 void handleOutgoingButton(ClickEvent e){
+		 GWT.log("outgoint button pressed");
+		 ClientPlaceController.get().goTo(new OutgoingPlace());
+	 }
+	 
+	 private String createTableRow(String label, Object value)
+	 {
+		 StringBuffer sb = new StringBuffer();
+		 sb.append("<tr><td>");
+		 sb.append(label);
+		 sb.append(": </td><td>");
+		 sb.append(value);
+		 sb.append("</td></tr>");
+		 return(sb.toString());
+	 }
+	 
+	 
+	 private String getJsonObjectValue(JSONObject o,String key)
+	 {
+		 String s = null;
+		 
+		 JSONValue jsonStr =  o.get(key);
+		 if(jsonStr != null) {
+			 if(jsonStr.isString() != null) {
+				 s = ((JSONString)jsonStr).stringValue();
+			 } else {
+				 s = jsonStr.toString();
+			 }
+		 }
+		 return(s);
+	 }
+	 
+	 
+	 public void showAdditional(String id)
+	 {
+		 GWT.log("additional info");
+		 Resource resource = new Resource("/archive/rest/soaarchive/incoming/" + id);
+		 resource.get().send(new JsonCallback() {
+			
+			@Override
+			public void onSuccess(Method method, JSONValue response) {
+				
+				JSONObject o = (JSONObject) response;
+				StringBuffer sb = new StringBuffer();
+				String value = o.get("id").toString();
+				sb.append("<h2>Additional Info</h2>");
+				sb.append("<table class=\"mdl-data-table tbl\">");
+				sb.append(createTableRow("ID", id));
+				value = getJsonObjectValue(o,"fromOutgoingId"); 
+				sb.append(createTableRow("Parent ID",value));
+				value = getJsonObjectValue(o,"dpSubCode"); 
+				sb.append(createTableRow("DP Sub Code",value));
+				value = getJsonObjectValue(o,"serviceName"); 
+				sb.append(createTableRow("Service Name ",value));
+				value = getJsonObjectValue(o,"serviceType"); 
+				sb.append(createTableRow("Service Type ",value));
+				value = getJsonObjectValue(o,"status"); 
+				sb.append(createTableRow("Status",value));
+				value = getJsonObjectValue(o,"statusTime"); 
+				sb.append(createTableRow("Status Time",value));
+				value = getJsonObjectValue(o,"lastUser"); 
+				sb.append(createTableRow("Last User",value));
+				value = getJsonObjectValue(o,"errorTime"); 
+				sb.append(createTableRow("Error Time",value));
+				value = getJsonObjectValue(o,"incomingTime"); 
+				sb.append(createTableRow("Incoming Time",value));
+				value = getJsonObjectValue(o,"closeTime"); 
+				sb.append(createTableRow("Close Time",value));
+				value = o.get("rerunsNum").toString(); 
+				sb.append(createTableRow("Num Reruns",value));
+				value = getJsonObjectValue(o,"fromQueue"); 
+				sb.append(createTableRow("Queue",value));
+				value = getJsonObjectValue(o,"fromQMgr"); 
+				sb.append(createTableRow("Queue Manager",value));
+				value = getJsonObjectValue(o,"errorCode"); 
+				sb.append(createTableRow("Error Code",value));
+				value = getJsonObjectValue(o,"errorMessage"); 
+				sb.append(createTableRow("Error Message",value));
+				value = o.get("payloadSize").toString(); 
+				sb.append(createTableRow("Payload Size",value));
+				value = getJsonObjectValue(o,"getTime"); 
+				sb.append(createTableRow("Get Time",value));
+				value = getJsonObjectValue(o,"fromServerName"); 
+				sb.append(createTableRow("Server Name",value));
+				value = getJsonObjectValue(o,"fromServerIp"); 
+				sb.append(createTableRow("Server IP",value));
+				value = o.get("mqMessageId").toString(); 
+				sb.append(createTableRow("MQ Message Id",value));
+				value = getJsonObjectValue(o,"mqRfh2"); 
+				sb.append(createTableRow("MQ RFH2","<xmp>" +value + "</xmp>"));
+				value = o.get("mqBackoutCount").toString(); 
+				sb.append(createTableRow("MQ BackoutCount",value));
+				
+				value = getJsonObjectValue(o,"bipText"); 
+				sb.append(createTableRow("Bip Text",value));
+				value = getJsonObjectValue(o,"bipCode"); 
+				sb.append(createTableRow("Bip Code",value));
+				
+				value = getJsonObjectValue(o,"expiryTime"); 
+				sb.append(createTableRow("Expiry Time",value));
+				value = getJsonObjectValue(o,"mqMD"); 
+				sb.append(createTableRow("MQMD","<xmp>" + value + "</xmp>"));
+				String text = sb.toString();
+				GWT.log(text);
+				InfoPanel infoPanel = new InfoPanel();
+				infoPanel.setText(text);
+				dialogPanel.clear();
+				dialogPanel.add(infoPanel);
+				modalDlg.open();
+			}
+			
+			@Override
+			public void onFailure(Method method, Throwable exception) {
+				// TODO Auto-generated method stub
+				GWT.log("error = " + exception);
+				
+			}
+		});
+		 
+		 
+		 
+	 }
+	 
+	 public void showErrorMessage(String id)
+	 {
+		 GWT.log("in showeErrorMessge =" + id);
+		 
+		 Resource resource = new Resource("/archive/rest/soaarchive/error/" + id);
+		 resource.get().send(new TextCallback() {
+			
+			@Override
+			public void onSuccess(Method method, String response) {
+				// TODO Auto-generated method stub
+				InfoPanel infoPanel = new InfoPanel();
+				String title = "<h2>Error Message</h2>";
+				if(response == null) {
+					response = "No Error";
+				}
+				infoPanel.setText(title + response);
+				 dialogPanel.clear();
+				 dialogPanel.add(infoPanel);
+				 modalDlg.open();
+				
+			}
+			
+			@Override
+			public void onFailure(Method method, Throwable exception) {
+				// TODO Auto-generated method stub
+				Window.alert("Error: " + exception);
+
+			}
+		});
+
+		 
+		 
+		 
+	 }
+	 
+	 public void showPayloadData(String id){
+		 GWT.log("in showPayloadData =" + id);
+		 
+		 Resource resource = new Resource("/archive/rest/soaarchive/payload/" + id);
+		 resource.get().send(new TextCallback() {
+			
+			@Override
+			public void onSuccess(Method method, String response) {
+				// TODO Auto-generated method stub
+				if(response != null) {
+					InfoPanel infoPanel = new InfoPanel();
+					String title = "<h2>Payload Data</h2>";
+					infoPanel.setText(title+ "<xmp>" + response + "</xmp>");
+					dialogPanel.clear();
+					dialogPanel.add(infoPanel);
+					modalDlg.open();
+				} else {
+					Window.alert("Payload is empty !");
+				}
+				
+			}
+			
+			@Override
+			public void onFailure(Method method, Throwable exception) {
+				// TODO Auto-generated method stub
+				GWT.log("error = " + exception);
+				Window.alert("Error: " + exception);
+
+			}
+		});
+
+		 
+		 
+	 }
+	 
+	 public native void clearSelected()  /*-{
+		   	$wnd.table.column(0).checkboxes.deselect();
+	         console.log("clearing rows...");
+		 }-*/;
+	 
+	 
+	 public native JavaScriptObject selectedRows() /*-{
+	   	var rows_selected = $wnd.table.column(0).checkboxes.selected();
+           console.log("row selectd=" + rows_selected);
+       		return(rows_selected);
+	 }-*/;
+	 
+	 
+	 public void initTable()
+	 {
+		 callRest();
+
+	 }
+	 
+	 public void callRest()
+	 {
+		 
+		 progDlg.open();
+		 Resource resource = new Resource("/archive/rest/soaarchive/incoming");
+		 JSONValue request = (searchRequest != null ? searchRequest: new JSONObject());
+		 resource.post().json(request).send(new JsonCallback() {
+	
+			@Override
+			public void onSuccess(Method method, JSONValue response) {
+				// TODO Auto-generated method stub
+				progDlg.close();
+				String data = response.toString();
+				displayRowCounts(response);
+				initTableNative(data);
+				
+			}
+			
+			@Override
+			public void onFailure(Method method, Throwable exception) {
+				// TODO Auto-generated method stub
+				GWT.log("onFailure json " +  exception);
+				Window.alert("Error: " + exception);
+				progDlg.close();
+
+
+			}
+		});
+
+		 
+		 
+	 }
+	 
+	 
+	 private void displayRowCounts(JSONValue response)
+	 {
+		 JSONObject o =(JSONObject) response;
+		 String totalRows = o.get("totalRows").toString();
+		 String returnedRows = o.get("returnedRows").toString();
+		 GWT.log("totalRows = " + totalRows + " returnedRows = " + returnedRows);
+		 rowsLabel.setText("Displaying " + returnedRows + " out of " + totalRows + " in the database for this query");
+	 }
+	 public native void updateData(String data) /*-{
+	 	
+	 	var dataObj = JSON.parse(data);
+	 	$wnd.table.clear();
+	 	for(var i=0; i < dataObj.data.length; ++i) {
+	 		$wnd.table.row.add(dataObj.data[i]);
+	 	}
+	 	$wnd.table.draw();
+	 	
+	 }-*/;
+	 
+	 public native void destroyTable() /*-{
+	 	
+	 	$wnd.table.destroy();
+	 	
+	 }-*/;
+	 
+	 
+	 
+	 public native void initTableNative(String data) /*-{
+	 
+	 var jsonData = JSON.parse(data);
+	 console.log("data.totalrows = " + jsonData.totalRows);
+	 that = this;
+	 $wnd.$($doc).ready(function(){
+	
+	  
+	  $wnd.showData= function(data){
+   			console.log("in showData data=" + data);
+   			that.@il.co.menora.soaarchive.client.widgets.layout.DataTablePage::showPayloadData(Ljava/lang/String;)(data);
+   	  };
+	 $wnd.showError= function(data){
+   			console.log("in showError data=" + data);
+   			that.@il.co.menora.soaarchive.client.widgets.layout.DataTablePage::showErrorMessage(Ljava/lang/String;)(data);
+   	  };
+	 
+	 $wnd.showAdditional= function(data){
+   			console.log("in showAdditional data=" + data);
+   			that.@il.co.menora.soaarchive.client.widgets.layout.DataTablePage::showAdditional(Ljava/lang/String;)(data);
+   	  };
+   	     $wnd.$.fn.dataTable.moment( 'DD/MM/YYYY hh:mm:ss' );
+			
+	 
+		 $wnd.table = $wnd.$('#incomingTbl').DataTable( {
+        	"data" : jsonData.data,	
+        	//"scrollY":  "400px",
+        	//"scrollCollapse": true,
+        	//"paging" : false,
+       	    "bFilter": false,
+            'columns' :[
+        		{ 'data': 'id'},
+        		{'data': 'serviceName'},
+        		{'data': 'serviceType'},
+        		{'data': 'status'},
+		        {'data': 'statusTime'},
+		        {'data': 'lastUser'},
+		        {'data': 'payloadSize'},
+		        {'data': 'additionalId'},
+		 		{'data': 'errorTime'}, 
+		 		{'data': 'errorCode'},
+		 		{'data': 'fromQueue'},
+		 		{'data': 'fromQMgr'},
+		 		{'data': 'rerunsNum'}
+		 		
+        	],
+	      'columnDefs': [
+	         {
+	            'targets': 0,
+	            'checkboxes': {
+	               'selectRow': false
+	            },
+	           'className': 'mdl-data-table__cell--non-numeric'
+	
+	         },
+	         {
+	         	'targets': 6,
+	         	'type': 'file-size'
+	         },
+	         {
+	          'targets': 7,
+	          'render': function(data,type,full,meta) {
+	          				return('<img src="images/info.png" height="20" width="20" alt="info" title="information" onclick="showAdditional(\'' +data + '\');"/>'
+	                  +'<img src="images/xml.png" height="20" width="20" alt="info" title="xml" onclick="showData(\'' +data + '\');"/>'
+	                + '<img src="images/error.png" height="20" width="20" alt="info" title="error" onclick="showError(\'' +data + '\');">');
+	          				
+	          				
+	          			}
+	          }
+	      ],
+	      'select': {
+	         'style': 'multi'
+	      },
+	      'order': [[4, 'desc']]
+   });
+   
+
+});
+ }-*/;
+
+	@Override
+	protected void onAttach() {
+		// TODO Auto-generated method stub
+		super.onAttach();
+		GWT.log("onAttach called");
+		initTable();
+	}
+
+	@Override
+	protected void onDetach() {
+		// TODO Auto-generated method stub
+		super.onDetach();
+		GWT.log("onDetach called");
+		destroyTable();
+	}
+
+}

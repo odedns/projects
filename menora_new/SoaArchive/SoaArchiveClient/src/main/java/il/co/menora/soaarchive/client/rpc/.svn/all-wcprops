@@ -1,0 +1,29 @@
+K 25
+svn:wc:ra_dav:version-url
+V 93
+/mnr_repos/ESB/!svn/ver/382/SoaArchiveClient/src/main/java/il/co/menora/soaarchive/client/rpc
+END
+AsyncCallbackDecorator.java
+K 25
+svn:wc:ra_dav:version-url
+V 121
+/mnr_repos/ESB/!svn/ver/382/SoaArchiveClient/src/main/java/il/co/menora/soaarchive/client/rpc/AsyncCallbackDecorator.java
+END
+ClientService.java
+K 25
+svn:wc:ra_dav:version-url
+V 112
+/mnr_repos/ESB/!svn/ver/382/SoaArchiveClient/src/main/java/il/co/menora/soaarchive/client/rpc/ClientService.java
+END
+SoaArchiveService.java
+K 25
+svn:wc:ra_dav:version-url
+V 116
+/mnr_repos/ESB/!svn/ver/382/SoaArchiveClient/src/main/java/il/co/menora/soaarchive/client/rpc/SoaArchiveService.java
+END
+SoaArchiveServiceAsync.java
+K 25
+svn:wc:ra_dav:version-url
+V 121
+/mnr_repos/ESB/!svn/ver/382/SoaArchiveClient/src/main/java/il/co/menora/soaarchive/client/rpc/SoaArchiveServiceAsync.java
+END

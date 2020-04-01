@@ -1,0 +1,6 @@
+il/co/menora/soaarchive/web/rpc/SoaArchiveServiceImpl.class
+il/co/menora/soaarchive/web/filters/SoaArchiveSessionListener.class
+il/co/menora/soaarchive/web/filters/SecurityFilter.class
+il/co/menora/soaarchive/web/rest/SoaArchiveService.class
+il/co/menora/soaarchive/web/filters/ResponseFilter.class
+test/TestServlet.class

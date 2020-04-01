@@ -1,0 +1,389 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.apache.kafka.clients.producer.ProducerBatchTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2016-12-20T07:52:25" hostname="oded-Latitude-3440" time="0.155">
+  <properties/>
+  <testcase name="testMultipleSend" classname="org.apache.kafka.clients.producer.ProducerBatchTest" time="0.098"/>
+  <testcase name="testLargeSend" classname="org.apache.kafka.clients.producer.ProducerBatchTest" time="0.055"/>
+  <system-out><![CDATA[09:52:25.800 [Test worker] INFO org.apache.kafka.clients.producer.ProducerConfig - ProducerConfig values: 
+	acks = all
+	batch.size = 16384
+	block.on.buffer.full = false
+	bootstrap.servers = [localhost]
+	buffer.memory = 33554432
+	client.id = 
+	compression.type = none
+	connections.max.idle.ms = 540000
+	interceptor.classes = [test.org.apache.kafka.clients.producer.TestInterceptor]
+	key.serializer = class org.apache.kafka.common.serialization.StringSerializer
+	linger.ms = 10000
+	max.block.ms = 60000
+	max.in.flight.requests.per.connection = 5
+	max.request.size = 1048576
+	metadata.fetch.timeout.ms = 60000
+	metadata.max.age.ms = 300000
+	metric.reporters = []
+	metrics.num.samples = 2
+	metrics.sample.window.ms = 30000
+	partitioner.class = class org.apache.kafka.clients.producer.internals.DefaultPartitioner
+	receive.buffer.bytes = 32768
+	reconnect.backoff.ms = 50
+	request.timeout.ms = 30000
+	retries = 0
+	retry.backoff.ms = 100
+	sasl.kerberos.kinit.cmd = /usr/bin/kinit
+	sasl.kerberos.min.time.before.relogin = 60000
+	sasl.kerberos.service.name = null
+	sasl.kerberos.ticket.renew.jitter = 0.05
+	sasl.kerberos.ticket.renew.window.factor = 0.8
+	sasl.mechanism = GSSAPI
+	security.protocol = PLAINTEXT
+	send.buffer.bytes = 131072
+	ssl.cipher.suites = null
+	ssl.enabled.protocols = [TLSv1.2, TLSv1.1, TLSv1]
+	ssl.endpoint.identification.algorithm = null
+	ssl.key.password = null
+	ssl.keymanager.algorithm = SunX509
+	ssl.keystore.location = null
+	ssl.keystore.password = null
+	ssl.keystore.type = JKS
+	ssl.protocol = TLS
+	ssl.provider = null
+	ssl.secure.random.implementation = null
+	ssl.trustmanager.algorithm = PKIX
+	ssl.truststore.location = null
+	ssl.truststore.password = null
+	ssl.truststore.type = JKS
+	timeout.ms = 30000
+	v3io.container.fs.client.factory = io.iguaz.v3io.fs.client.SimulatorFSClientFactory
+	value.serializer = class org.apache.kafka.common.serialization.StringSerializer
+
+09:52:25.804 [Test worker] INFO org.apache.kafka.clients.producer.ProducerConfig - ProducerConfig values: 
+	acks = all
+	batch.size = 16384
+	block.on.buffer.full = false
+	bootstrap.servers = [localhost]
+	buffer.memory = 33554432
+	client.id = producer-5
+	compression.type = none
+	connections.max.idle.ms = 540000
+	interceptor.classes = [test.org.apache.kafka.clients.producer.TestInterceptor]
+	key.serializer = class org.apache.kafka.common.serialization.StringSerializer
+	linger.ms = 10000
+	max.block.ms = 60000
+	max.in.flight.requests.per.connection = 5
+	max.request.size = 1048576
+	metadata.fetch.timeout.ms = 60000
+	metadata.max.age.ms = 300000
+	metric.reporters = []
+	metrics.num.samples = 2
+	metrics.sample.window.ms = 30000
+	partitioner.class = class org.apache.kafka.clients.producer.internals.DefaultPartitioner
+	receive.buffer.bytes = 32768
+	reconnect.backoff.ms = 50
+	request.timeout.ms = 30000
+	retries = 0
+	retry.backoff.ms = 100
+	sasl.kerberos.kinit.cmd = /usr/bin/kinit
+	sasl.kerberos.min.time.before.relogin = 60000
+	sasl.kerberos.service.name = null
+	sasl.kerberos.ticket.renew.jitter = 0.05
+	sasl.kerberos.ticket.renew.window.factor = 0.8
+	sasl.mechanism = GSSAPI
+	security.protocol = PLAINTEXT
+	send.buffer.bytes = 131072
+	ssl.cipher.suites = null
+	ssl.enabled.protocols = [TLSv1.2, TLSv1.1, TLSv1]
+	ssl.endpoint.identification.algorithm = null
+	ssl.key.password = null
+	ssl.keymanager.algorithm = SunX509
+	ssl.keystore.location = null
+	ssl.keystore.password = null
+	ssl.keystore.type = JKS
+	ssl.protocol = TLS
+	ssl.provider = null
+	ssl.secure.random.implementation = null
+	ssl.trustmanager.algorithm = PKIX
+	ssl.truststore.location = null
+	ssl.truststore.password = null
+	ssl.truststore.type = JKS
+	timeout.ms = 30000
+	v3io.container.fs.client.factory = io.iguaz.v3io.fs.client.SimulatorFSClientFactory
+	value.serializer = class org.apache.kafka.common.serialization.StringSerializer
+
+TestInterceptor.configure()
+09:52:25.812 [Test worker] DEBUG io.iguaz.v3io.container.FSClientHelper - Creating FS client of type 'io.iguaz.v3io.fs.client.SimulatorFSClientFactory'
+09:52:25.813 [Test worker] DEBUG io.iguaz.v3io.fs.client.SimulatorFSClientFactory - SimulatorFSClientFactory called!
+09:52:25.813 [Test worker] DEBUG io.iguaz.v3io.container.ContainerImpl - Setting containerId to: 1
+09:52:25.813 [Test worker] DEBUG io.iguaz.v3io.container.ContainerImpl - Setting containerAlias to: test_container
+09:52:25.813 [Test worker] DEBUG io.iguaz.v3io.container.ContainerImpl - Successfully opened container: 1
+TestInterceptor.onSend()
+numPartitions = 1
+09:52:25.815 [Test worker] DEBUG io.iguaz.v3io.container.FSClientHelper - Creating FS client of type 'io.iguaz.v3io.fs.client.SimulatorFSClientFactory'
+09:52:25.815 [Test worker] DEBUG io.iguaz.v3io.fs.client.SimulatorFSClientFactory - SimulatorFSClientFactory called!
+09:52:25.816 [Test worker] DEBUG io.iguaz.v3io.container.ContainerImpl - Setting containerId to: 1
+09:52:25.816 [Test worker] DEBUG io.iguaz.v3io.container.ContainerImpl - Setting containerAlias to: test_container
+09:52:25.816 [Test worker] DEBUG io.iguaz.v3io.container.ContainerImpl - Successfully opened container: 1
+09:52:25.816 [Test worker] DEBUG io.iguaz.v3io.container.V3IOFileOperations - Setting defaultBlockSize to: 524288
+09:52:25.816 [Test worker] DEBUG io.iguaz.v3io.container.V3IOFileOperations - Setting maxFilesInListDir to: 300
+09:52:25.816 [Test worker] DEBUG io.iguaz.v3io.container.V3IOFileOperations - Setting blockReplication to: 1
+09:52:25.816 [Test worker] DEBUG io.iguaz.v3io.container.V3IOFileOperations - Setting prefetchQueueSize to: 5
+09:52:25.816 [Test worker] DEBUG io.iguaz.v3io.container.V3IOFileOperations - Setting useThreadSafeInputStream to: false
+09:52:25.816 [Test worker] DEBUG io.iguaz.v3io.container.V3IOFileOperations - Setting useThreadSafeOutputStream to: false
+09:52:25.816 [Test worker] DEBUG io.iguaz.v3io.container.V3IOFileOperations - Setting maximumWriteSizeBytes to: 2097152
+09:52:25.816 [Test worker] DEBUG io.iguaz.v3io.container.FSClientHelper - Creating FS client of type 'io.iguaz.v3io.fs.client.SimulatorFSClientFactory'
+09:52:25.817 [Test worker] DEBUG io.iguaz.v3io.fs.client.SimulatorFSClientFactory - SimulatorFSClientFactory called!
+09:52:25.817 [Test worker] DEBUG io.iguaz.v3io.container.ContainerImpl - Setting containerId to: 1
+09:52:25.817 [Test worker] DEBUG io.iguaz.v3io.container.ContainerImpl - Setting containerAlias to: test_container
+09:52:25.818 [Test worker] DEBUG io.iguaz.v3io.container.ContainerImpl - Successfully opened container: 1
+09:52:25.818 [Test worker] DEBUG io.iguaz.v3io.streaming.PutRecordsRequest - write to stream: value length 7, key length 4, header size 36
+09:52:25.819 [Test worker] DEBUG io.iguaz.v3io.streaming.PartitionBatchData - sending batch of 1 records
+09:52:25.820 [Test worker] DEBUG io.iguaz.v3io.streaming.client.api.ConsumerRecord - Loading consumer record from stream of producer records.
+09:52:25.820 [Test worker] DEBUG io.iguaz.v3io.streaming.client.api.ConsumerRecord - Record: ConsumerRecord[ConsumerRecord.Header[Key=14,Payload size=7,Create time (ms)=1482220345815,Create time (ns)=0],(34/7/4),Payload=value10]
+09:52:25.821 [Test worker] DEBUG io.iguaz.v3io.fs.client.SimulatorV3IOMessage - Calling getResponseBuffer on simulated message - returning the pre-set buffer
+09:52:25.821 [Test worker] DEBUG io.iguaz.v3io.streaming.client.api.producer.internal.PutRecordsResponseList - going to signal callback on record PutRecordsResponseList.Record[seqInBatch=0,success=true,seqId=0,partitionId=0,errCode=OK]
+TestInterceptor.onAcknowledgement()
+09:52:25.821 [Test worker] DEBUG io.iguaz.v3io.fs.client.SimulatorV3IOMessage - message recycled
+got meta = /testTopic-0@1
+TestInterceptor.onSend()
+numPartitions = 1
+09:52:25.828 [Test worker] DEBUG io.iguaz.v3io.streaming.PutRecordsRequest - write to stream: value length 7, key length 4, header size 36
+09:52:25.828 [Test worker] DEBUG io.iguaz.v3io.streaming.PartitionBatchData - sending batch of 1 records
+09:52:25.832 [Test worker] DEBUG io.iguaz.v3io.streaming.client.api.ConsumerRecord - Loading consumer record from stream of producer records.
+09:52:25.833 [Test worker] DEBUG io.iguaz.v3io.streaming.client.api.ConsumerRecord - Record: ConsumerRecord[ConsumerRecord.Header[Key=15,Payload size=7,Create time (ms)=1482220345823,Create time (ns)=0],(34/7/4),Payload=value11]
+09:52:25.835 [Test worker] DEBUG io.iguaz.v3io.fs.client.SimulatorV3IOMessage - Calling getResponseBuffer on simulated message - returning the pre-set buffer
+09:52:25.835 [Test worker] DEBUG io.iguaz.v3io.streaming.client.api.producer.internal.PutRecordsResponseList - going to signal callback on record PutRecordsResponseList.Record[seqInBatch=0,success=true,seqId=0,partitionId=0,errCode=OK]
+TestInterceptor.onAcknowledgement()
+09:52:25.835 [Test worker] DEBUG io.iguaz.v3io.fs.client.SimulatorV3IOMessage - message recycled
+got meta = /testTopic-0@1
+TestInterceptor.onSend()
+numPartitions = 1
+09:52:25.837 [Test worker] DEBUG io.iguaz.v3io.streaming.PutRecordsRequest - write to stream: value length 7, key length 4, header size 36
+09:52:25.837 [Test worker] DEBUG io.iguaz.v3io.streaming.PartitionBatchData - sending batch of 1 records
+09:52:25.839 [Test worker] DEBUG io.iguaz.v3io.streaming.client.api.ConsumerRecord - Loading consumer record from stream of producer records.
+09:52:25.839 [Test worker] DEBUG io.iguaz.v3io.streaming.client.api.ConsumerRecord - Record: ConsumerRecord[ConsumerRecord.Header[Key=16,Payload size=7,Create time (ms)=1482220345837,Create time (ns)=0],(34/7/4),Payload=value12]
+09:52:25.840 [Test worker] DEBUG io.iguaz.v3io.fs.client.SimulatorV3IOMessage - Calling getResponseBuffer on simulated message - returning the pre-set buffer
+09:52:25.841 [Test worker] DEBUG io.iguaz.v3io.streaming.client.api.producer.internal.PutRecordsResponseList - going to signal callback on record PutRecordsResponseList.Record[seqInBatch=0,success=true,seqId=0,partitionId=0,errCode=OK]
+TestInterceptor.onAcknowledgement()
+09:52:25.842 [Test worker] DEBUG io.iguaz.v3io.fs.client.SimulatorV3IOMessage - message recycled
+got meta = /testTopic-0@1
+TestInterceptor.onSend()
+numPartitions = 1
+09:52:25.845 [Test worker] DEBUG io.iguaz.v3io.streaming.PutRecordsRequest - write to stream: value length 7, key length 4, header size 36
+09:52:25.845 [Test worker] DEBUG io.iguaz.v3io.streaming.PartitionBatchData - sending batch of 1 records
+09:52:25.846 [Test worker] DEBUG io.iguaz.v3io.streaming.client.api.ConsumerRecord - Loading consumer record from stream of producer records.
+09:52:25.847 [Test worker] DEBUG io.iguaz.v3io.streaming.client.api.ConsumerRecord - Record: ConsumerRecord[ConsumerRecord.Header[Key=17,Payload size=7,Create time (ms)=1482220345844,Create time (ns)=0],(34/7/4),Payload=value13]
+09:52:25.848 [Test worker] DEBUG io.iguaz.v3io.fs.client.SimulatorV3IOMessage - Calling getResponseBuffer on simulated message - returning the pre-set buffer
+09:52:25.849 [Test worker] DEBUG io.iguaz.v3io.streaming.client.api.producer.internal.PutRecordsResponseList - going to signal callback on record PutRecordsResponseList.Record[seqInBatch=0,success=true,seqId=0,partitionId=0,errCode=OK]
+TestInterceptor.onAcknowledgement()
+09:52:25.850 [Test worker] DEBUG io.iguaz.v3io.fs.client.SimulatorV3IOMessage - message recycled
+got meta = /testTopic-0@1
+TestInterceptor.onSend()
+numPartitions = 1
+09:52:25.854 [Test worker] DEBUG io.iguaz.v3io.streaming.PutRecordsRequest - write to stream: value length 7, key length 4, header size 36
+09:52:25.854 [Test worker] DEBUG io.iguaz.v3io.streaming.PartitionBatchData - sending batch of 1 records
+09:52:25.856 [Test worker] DEBUG io.iguaz.v3io.streaming.client.api.ConsumerRecord - Loading consumer record from stream of producer records.
+09:52:25.856 [Test worker] DEBUG io.iguaz.v3io.streaming.client.api.ConsumerRecord - Record: ConsumerRecord[ConsumerRecord.Header[Key=18,Payload size=7,Create time (ms)=1482220345854,Create time (ns)=0],(34/7/4),Payload=value14]
+09:52:25.858 [Test worker] DEBUG io.iguaz.v3io.fs.client.SimulatorV3IOMessage - Calling getResponseBuffer on simulated message - returning the pre-set buffer
+09:52:25.858 [Test worker] DEBUG io.iguaz.v3io.streaming.client.api.producer.internal.PutRecordsResponseList - going to signal callback on record PutRecordsResponseList.Record[seqInBatch=0,success=true,seqId=0,partitionId=0,errCode=OK]
+TestInterceptor.onAcknowledgement()
+09:52:25.860 [Test worker] DEBUG io.iguaz.v3io.fs.client.SimulatorV3IOMessage - message recycled
+got meta = /testTopic-0@1
+TestInterceptor.onSend()
+numPartitions = 1
+09:52:25.862 [Test worker] DEBUG io.iguaz.v3io.streaming.PutRecordsRequest - write to stream: value length 7, key length 4, header size 36
+09:52:25.863 [Test worker] DEBUG io.iguaz.v3io.streaming.PartitionBatchData - sending batch of 1 records
+09:52:25.864 [Test worker] DEBUG io.iguaz.v3io.streaming.client.api.ConsumerRecord - Loading consumer record from stream of producer records.
+09:52:25.865 [Test worker] DEBUG io.iguaz.v3io.streaming.client.api.ConsumerRecord - Record: ConsumerRecord[ConsumerRecord.Header[Key=19,Payload size=7,Create time (ms)=1482220345862,Create time (ns)=0],(34/7/4),Payload=value15]
+09:52:25.866 [Test worker] DEBUG io.iguaz.v3io.fs.client.SimulatorV3IOMessage - Calling getResponseBuffer on simulated message - returning the pre-set buffer
+09:52:25.866 [Test worker] DEBUG io.iguaz.v3io.streaming.client.api.producer.internal.PutRecordsResponseList - going to signal callback on record PutRecordsResponseList.Record[seqInBatch=0,success=true,seqId=0,partitionId=0,errCode=OK]
+TestInterceptor.onAcknowledgement()
+09:52:25.867 [Test worker] DEBUG io.iguaz.v3io.fs.client.SimulatorV3IOMessage - message recycled
+got meta = /testTopic-0@1
+TestInterceptor.onSend()
+numPartitions = 1
+09:52:25.869 [Test worker] DEBUG io.iguaz.v3io.streaming.PutRecordsRequest - write to stream: value length 7, key length 4, header size 36
+09:52:25.869 [Test worker] DEBUG io.iguaz.v3io.streaming.PartitionBatchData - sending batch of 1 records
+09:52:25.870 [Test worker] DEBUG io.iguaz.v3io.streaming.client.api.ConsumerRecord - Loading consumer record from stream of producer records.
+09:52:25.870 [Test worker] DEBUG io.iguaz.v3io.streaming.client.api.ConsumerRecord - Record: ConsumerRecord[ConsumerRecord.Header[Key=20,Payload size=7,Create time (ms)=1482220345868,Create time (ns)=0],(34/7/4),Payload=value16]
+09:52:25.871 [Test worker] DEBUG io.iguaz.v3io.fs.client.SimulatorV3IOMessage - Calling getResponseBuffer on simulated message - returning the pre-set buffer
+09:52:25.871 [Test worker] DEBUG io.iguaz.v3io.streaming.client.api.producer.internal.PutRecordsResponseList - going to signal callback on record PutRecordsResponseList.Record[seqInBatch=0,success=true,seqId=0,partitionId=0,errCode=OK]
+TestInterceptor.onAcknowledgement()
+09:52:25.871 [Test worker] DEBUG io.iguaz.v3io.fs.client.SimulatorV3IOMessage - message recycled
+got meta = /testTopic-0@1
+TestInterceptor.onSend()
+numPartitions = 1
+09:52:25.884 [Test worker] DEBUG io.iguaz.v3io.streaming.PutRecordsRequest - write to stream: value length 7, key length 4, header size 36
+09:52:25.885 [Test worker] DEBUG io.iguaz.v3io.streaming.PartitionBatchData - sending batch of 1 records
+09:52:25.885 [Test worker] DEBUG io.iguaz.v3io.streaming.client.api.ConsumerRecord - Loading consumer record from stream of producer records.
+09:52:25.886 [Test worker] DEBUG io.iguaz.v3io.streaming.client.api.ConsumerRecord - Record: ConsumerRecord[ConsumerRecord.Header[Key=21,Payload size=7,Create time (ms)=1482220345884,Create time (ns)=0],(34/7/4),Payload=value17]
+09:52:25.888 [Test worker] DEBUG io.iguaz.v3io.fs.client.SimulatorV3IOMessage - Calling getResponseBuffer on simulated message - returning the pre-set buffer
+09:52:25.889 [Test worker] DEBUG io.iguaz.v3io.streaming.client.api.producer.internal.PutRecordsResponseList - going to signal callback on record PutRecordsResponseList.Record[seqInBatch=0,success=true,seqId=0,partitionId=0,errCode=OK]
+TestInterceptor.onAcknowledgement()
+09:52:25.889 [Test worker] DEBUG io.iguaz.v3io.fs.client.SimulatorV3IOMessage - message recycled
+got meta = /testTopic-0@1
+TestInterceptor.onSend()
+numPartitions = 1
+09:52:25.890 [Test worker] DEBUG io.iguaz.v3io.streaming.PutRecordsRequest - write to stream: value length 7, key length 4, header size 36
+09:52:25.891 [Test worker] DEBUG io.iguaz.v3io.streaming.PartitionBatchData - sending batch of 1 records
+09:52:25.891 [Test worker] DEBUG io.iguaz.v3io.streaming.client.api.ConsumerRecord - Loading consumer record from stream of producer records.
+09:52:25.891 [Test worker] DEBUG io.iguaz.v3io.streaming.client.api.ConsumerRecord - Record: ConsumerRecord[ConsumerRecord.Header[Key=22,Payload size=7,Create time (ms)=1482220345890,Create time (ns)=0],(34/7/4),Payload=value18]
+09:52:25.892 [Test worker] DEBUG io.iguaz.v3io.fs.client.SimulatorV3IOMessage - Calling getResponseBuffer on simulated message - returning the pre-set buffer
+09:52:25.892 [Test worker] DEBUG io.iguaz.v3io.streaming.client.api.producer.internal.PutRecordsResponseList - going to signal callback on record PutRecordsResponseList.Record[seqInBatch=0,success=true,seqId=0,partitionId=0,errCode=OK]
+TestInterceptor.onAcknowledgement()
+09:52:25.892 [Test worker] DEBUG io.iguaz.v3io.fs.client.SimulatorV3IOMessage - message recycled
+got meta = /testTopic-0@1
+TestInterceptor.onSend()
+numPartitions = 1
+09:52:25.894 [Test worker] DEBUG io.iguaz.v3io.streaming.PutRecordsRequest - write to stream: value length 7, key length 4, header size 36
+09:52:25.894 [Test worker] DEBUG io.iguaz.v3io.streaming.PartitionBatchData - sending batch of 1 records
+09:52:25.894 [Test worker] DEBUG io.iguaz.v3io.streaming.client.api.ConsumerRecord - Loading consumer record from stream of producer records.
+09:52:25.895 [Test worker] DEBUG io.iguaz.v3io.streaming.client.api.ConsumerRecord - Record: ConsumerRecord[ConsumerRecord.Header[Key=23,Payload size=7,Create time (ms)=1482220345894,Create time (ns)=0],(34/7/4),Payload=value19]
+09:52:25.895 [Test worker] DEBUG io.iguaz.v3io.fs.client.SimulatorV3IOMessage - Calling getResponseBuffer on simulated message - returning the pre-set buffer
+09:52:25.895 [Test worker] DEBUG io.iguaz.v3io.streaming.client.api.producer.internal.PutRecordsResponseList - going to signal callback on record PutRecordsResponseList.Record[seqInBatch=0,success=true,seqId=0,partitionId=0,errCode=OK]
+TestInterceptor.onAcknowledgement()
+09:52:25.896 [Test worker] DEBUG io.iguaz.v3io.fs.client.SimulatorV3IOMessage - message recycled
+got meta = /testTopic-0@1
+09:52:25.897 [Test worker] DEBUG io.iguaz.v3io.container.ContainerImpl - Closing container id=1
+09:52:25.901 [Test worker] INFO org.apache.kafka.clients.producer.ProducerConfig - ProducerConfig values: 
+	acks = all
+	batch.size = 16384
+	block.on.buffer.full = false
+	bootstrap.servers = [localhost]
+	buffer.memory = 33554432
+	client.id = 
+	compression.type = none
+	connections.max.idle.ms = 540000
+	interceptor.classes = [test.org.apache.kafka.clients.producer.TestInterceptor]
+	key.serializer = class org.apache.kafka.common.serialization.StringSerializer
+	linger.ms = 10000
+	max.block.ms = 60000
+	max.in.flight.requests.per.connection = 5
+	max.request.size = 1048576
+	metadata.fetch.timeout.ms = 60000
+	metadata.max.age.ms = 300000
+	metric.reporters = []
+	metrics.num.samples = 2
+	metrics.sample.window.ms = 30000
+	partitioner.class = class org.apache.kafka.clients.producer.internals.DefaultPartitioner
+	receive.buffer.bytes = 32768
+	reconnect.backoff.ms = 50
+	request.timeout.ms = 30000
+	retries = 0
+	retry.backoff.ms = 100
+	sasl.kerberos.kinit.cmd = /usr/bin/kinit
+	sasl.kerberos.min.time.before.relogin = 60000
+	sasl.kerberos.service.name = null
+	sasl.kerberos.ticket.renew.jitter = 0.05
+	sasl.kerberos.ticket.renew.window.factor = 0.8
+	sasl.mechanism = GSSAPI
+	security.protocol = PLAINTEXT
+	send.buffer.bytes = 131072
+	ssl.cipher.suites = null
+	ssl.enabled.protocols = [TLSv1.2, TLSv1.1, TLSv1]
+	ssl.endpoint.identification.algorithm = null
+	ssl.key.password = null
+	ssl.keymanager.algorithm = SunX509
+	ssl.keystore.location = null
+	ssl.keystore.password = null
+	ssl.keystore.type = JKS
+	ssl.protocol = TLS
+	ssl.provider = null
+	ssl.secure.random.implementation = null
+	ssl.trustmanager.algorithm = PKIX
+	ssl.truststore.location = null
+	ssl.truststore.password = null
+	ssl.truststore.type = JKS
+	timeout.ms = 30000
+	v3io.container.fs.client.factory = io.iguaz.v3io.fs.client.SimulatorFSClientFactory
+	value.serializer = class org.apache.kafka.common.serialization.StringSerializer
+
+09:52:25.919 [Test worker] INFO org.apache.kafka.clients.producer.ProducerConfig - ProducerConfig values: 
+	acks = all
+	batch.size = 16384
+	block.on.buffer.full = false
+	bootstrap.servers = [localhost]
+	buffer.memory = 33554432
+	client.id = producer-6
+	compression.type = none
+	connections.max.idle.ms = 540000
+	interceptor.classes = [test.org.apache.kafka.clients.producer.TestInterceptor]
+	key.serializer = class org.apache.kafka.common.serialization.StringSerializer
+	linger.ms = 10000
+	max.block.ms = 60000
+	max.in.flight.requests.per.connection = 5
+	max.request.size = 1048576
+	metadata.fetch.timeout.ms = 60000
+	metadata.max.age.ms = 300000
+	metric.reporters = []
+	metrics.num.samples = 2
+	metrics.sample.window.ms = 30000
+	partitioner.class = class org.apache.kafka.clients.producer.internals.DefaultPartitioner
+	receive.buffer.bytes = 32768
+	reconnect.backoff.ms = 50
+	request.timeout.ms = 30000
+	retries = 0
+	retry.backoff.ms = 100
+	sasl.kerberos.kinit.cmd = /usr/bin/kinit
+	sasl.kerberos.min.time.before.relogin = 60000
+	sasl.kerberos.service.name = null
+	sasl.kerberos.ticket.renew.jitter = 0.05
+	sasl.kerberos.ticket.renew.window.factor = 0.8
+	sasl.mechanism = GSSAPI
+	security.protocol = PLAINTEXT
+	send.buffer.bytes = 131072
+	ssl.cipher.suites = null
+	ssl.enabled.protocols = [TLSv1.2, TLSv1.1, TLSv1]
+	ssl.endpoint.identification.algorithm = null
+	ssl.key.password = null
+	ssl.keymanager.algorithm = SunX509
+	ssl.keystore.location = null
+	ssl.keystore.password = null
+	ssl.keystore.type = JKS
+	ssl.protocol = TLS
+	ssl.provider = null
+	ssl.secure.random.implementation = null
+	ssl.trustmanager.algorithm = PKIX
+	ssl.truststore.location = null
+	ssl.truststore.password = null
+	ssl.truststore.type = JKS
+	timeout.ms = 30000
+	v3io.container.fs.client.factory = io.iguaz.v3io.fs.client.SimulatorFSClientFactory
+	value.serializer = class org.apache.kafka.common.serialization.StringSerializer
+
+TestInterceptor.configure()
+09:52:25.924 [Test worker] DEBUG io.iguaz.v3io.container.FSClientHelper - Creating FS client of type 'io.iguaz.v3io.fs.client.SimulatorFSClientFactory'
+09:52:25.925 [Test worker] DEBUG io.iguaz.v3io.fs.client.SimulatorFSClientFactory - SimulatorFSClientFactory called!
+09:52:25.927 [Test worker] DEBUG io.iguaz.v3io.container.ContainerImpl - Setting containerId to: 1
+09:52:25.927 [Test worker] DEBUG io.iguaz.v3io.container.ContainerImpl - Setting containerAlias to: test_container
+09:52:25.927 [Test worker] DEBUG io.iguaz.v3io.container.ContainerImpl - Successfully opened container: 1
+TestInterceptor.onSend()
+numPartitions = 1
+09:52:25.930 [Test worker] DEBUG io.iguaz.v3io.container.FSClientHelper - Creating FS client of type 'io.iguaz.v3io.fs.client.SimulatorFSClientFactory'
+09:52:25.931 [Test worker] DEBUG io.iguaz.v3io.fs.client.SimulatorFSClientFactory - SimulatorFSClientFactory called!
+09:52:25.933 [Test worker] DEBUG io.iguaz.v3io.container.ContainerImpl - Setting containerId to: 1
+09:52:25.934 [Test worker] DEBUG io.iguaz.v3io.container.ContainerImpl - Setting containerAlias to: test_container
+09:52:25.935 [Test worker] DEBUG io.iguaz.v3io.container.ContainerImpl - Successfully opened container: 1
+09:52:25.937 [Test worker] DEBUG io.iguaz.v3io.container.V3IOFileOperations - Setting defaultBlockSize to: 524288
+09:52:25.937 [Test worker] DEBUG io.iguaz.v3io.container.V3IOFileOperations - Setting maxFilesInListDir to: 300
+09:52:25.938 [Test worker] DEBUG io.iguaz.v3io.container.V3IOFileOperations - Setting blockReplication to: 1
+09:52:25.939 [Test worker] DEBUG io.iguaz.v3io.container.V3IOFileOperations - Setting prefetchQueueSize to: 5
+09:52:25.940 [Test worker] DEBUG io.iguaz.v3io.container.V3IOFileOperations - Setting useThreadSafeInputStream to: false
+09:52:25.940 [Test worker] DEBUG io.iguaz.v3io.container.V3IOFileOperations - Setting useThreadSafeOutputStream to: false
+09:52:25.940 [Test worker] DEBUG io.iguaz.v3io.container.V3IOFileOperations - Setting maximumWriteSizeBytes to: 2097152
+09:52:25.941 [Test worker] DEBUG io.iguaz.v3io.container.FSClientHelper - Creating FS client of type 'io.iguaz.v3io.fs.client.SimulatorFSClientFactory'
+09:52:25.941 [Test worker] DEBUG io.iguaz.v3io.fs.client.SimulatorFSClientFactory - SimulatorFSClientFactory called!
+09:52:25.942 [Test worker] DEBUG io.iguaz.v3io.container.ContainerImpl - Setting containerId to: 1
+09:52:25.943 [Test worker] DEBUG io.iguaz.v3io.container.ContainerImpl - Setting containerAlias to: test_container
+09:52:25.944 [Test worker] DEBUG io.iguaz.v3io.container.ContainerImpl - Successfully opened container: 1
+09:52:25.945 [Test worker] DEBUG io.iguaz.v3io.streaming.PutRecordsRequest - write to stream: value length 2000, key length 3, header size 35
+09:52:25.945 [Test worker] DEBUG io.iguaz.v3io.streaming.PartitionBatchData - sending batch of 1 records
+09:52:25.946 [Test worker] DEBUG io.iguaz.v3io.streaming.client.api.ConsumerRecord - Loading consumer record from stream of producer records.
+09:52:25.947 [Test worker] DEBUG io.iguaz.v3io.streaming.client.api.ConsumerRecord - Record: ConsumerRecord[ConsumerRecord.Header[Key=24,Payload size=2000,Create time (ms)=1482220345930,Create time (ns)=0],(34/2000/4),Payload=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA]
+09:52:25.951 [Test worker] DEBUG io.iguaz.v3io.fs.client.SimulatorV3IOMessage - Calling getResponseBuffer on simulated message - returning the pre-set buffer
+09:52:25.951 [Test worker] DEBUG io.iguaz.v3io.streaming.client.api.producer.internal.PutRecordsResponseList - going to signal callback on record PutRecordsResponseList.Record[seqInBatch=0,success=true,seqId=0,partitionId=0,errCode=OK]
+TestInterceptor.onAcknowledgement()
+09:52:25.953 [Test worker] DEBUG io.iguaz.v3io.fs.client.SimulatorV3IOMessage - message recycled
+got meta = /testTopic-0@1
+09:52:25.954 [Test worker] DEBUG io.iguaz.v3io.container.ContainerImpl - Closing container id=1
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,85 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui">
+	<ui:with field='res' type='il.co.menora.soaarchive.client.bundle.ClientResources' />
+
+	<g:HTMLPanel addStyleNames="WorkQueuePage">
+		זהו תור עבודה מספר
+		<span ui:field="workQueueNumberSpan" />
+		baga<br/>
+		baga<br/>
+		baga<br/>
+		baga<br/>
+		baga<br/>
+		baga<br/>
+		baga<br/>
+		baga<br/>
+		baga<br/>
+		baga<br/>
+		baga<br/>
+		baga<br/>
+		baga<br/>
+		baga<br/>
+		baga<br/>
+		baga<br/>
+		baga<br/>
+		baga<br/>
+		baga<br/>
+		baga<br/>
+		baga<br/>
+		baga<br/>
+		baga<br/>
+		baga<br/>
+		baga<br/>
+		baga<br/>
+		baga<br/>
+		baga<br/>
+		baga<br/>
+		baga<br/>
+		baga<br/>
+		baga<br/>
+		baga<br/>
+		baga<br/>
+		baga<br/>
+		baga<br/>
+		baga<br/>
+		baga<br/>
+		baga<br/>
+		baga<br/>
+		baga<br/>
+		baga<br/>
+		baga<br/>
+		baga<br/>
+		baga<br/>
+		baga<br/>
+		baga<br/>
+		baga<br/>
+		baga<br/>
+		baga<br/>
+		baga<br/>
+		baga<br/>
+		baga<br/>
+		baga<br/>
+		baga<br/>
+		baga<br/>
+		baga<br/>
+		baga<br/>
+		baga<br/>
+		baga<br/>
+		baga<br/>
+		baga<br/>
+		baga<br/>
+		baga<br/>
+		baga<br/>
+		baga<br/>
+		baga<br/>
+		baga<br/>
+		baga<br/>
+		baga<br/>
+		baga<br/>
+		baga<br/>
+		baga<br/>
+		baga<br/>
+		baga<br/>
+	</g:HTMLPanel>
+</ui:UiBinder> 

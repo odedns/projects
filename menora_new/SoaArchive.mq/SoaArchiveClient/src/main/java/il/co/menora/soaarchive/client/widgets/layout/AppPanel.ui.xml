@@ -1,0 +1,42 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:t.layout="urn:import:il.co.menora.soaarchive.client.widgets.layout" xmlns:p="urn:import:com.vaadin.polymer.paper.widget">
+	<ui:with field='res'
+		type='il.co.menora.soaarchive.client.bundle.ClientResources' />
+
+	<g:HTMLPanel addStyleNames="AppPanel,appPanel">
+		
+		
+				<paper-header-panel main="">
+					<paper-toolbar>
+						<paper-icon-button icon="menu" paper-drawer-toggle="" class="dropdown-trigger">
+						</paper-icon-button>
+						<span class="title">Soa Archive UI</span>						
+						<paper-icon-button  ui:field="reloadButton" icon="refresh" />
+						<paper-icon-button  ui:field="settingsAnchor" icon="settings" />
+						<paper-icon-button  ui:field="logoutAnchor" icon="exit-to-app"  href="logout.jsp"/>
+					</paper-toolbar>
+					
+				
+				</paper-header-panel>
+	<g:HTMLPanel ui:field="appPanel"
+						addStyleNames="content,vertical,center-justified,layout" />
+
+
+
+
+		<paper-dialog ui:field="settingsDialog" entry-animation="fade-in-animation"
+			class="dialog" modal="">
+			<h2>הגדרות</h2>
+			<paper-input ui:field="titleInput" label="Title"
+				required="" auto-validate="" error-message="required input!" />
+			<div class="textarea-container iron-autogrow-textarea">
+				<paper-textarea ui:field="descriptionInput" label="Notes" />
+			</div>
+			<div class="buttons">
+				<paper-button ui:field="confirmButton" dialog-confirm="">אישור</paper-button>
+				<paper-button dialog-dismiss="">ביטול</paper-button>
+			</div>
+		</paper-dialog>
+	</g:HTMLPanel>
+</ui:UiBinder> 

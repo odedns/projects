@@ -1,0 +1,23 @@
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/mnr_repos/ESB/!svn/ver/384/SoaArchiveEjb/src/main/java/il/co/menora/soaarchive/mq
+END
+SendMQResponse.java
+K 25
+svn:wc:ra_dav:version-url
+V 102
+/mnr_repos/ESB/!svn/ver/398/SoaArchiveEjb/src/main/java/il/co/menora/soaarchive/mq/SendMQResponse.java
+END
+SendMQRequest.java
+K 25
+svn:wc:ra_dav:version-url
+V 101
+/mnr_repos/ESB/!svn/ver/398/SoaArchiveEjb/src/main/java/il/co/menora/soaarchive/mq/SendMQRequest.java
+END
+MQRequestsHandler.java
+K 25
+svn:wc:ra_dav:version-url
+V 105
+/mnr_repos/ESB/!svn/ver/398/SoaArchiveEjb/src/main/java/il/co/menora/soaarchive/mq/MQRequestsHandler.java
+END

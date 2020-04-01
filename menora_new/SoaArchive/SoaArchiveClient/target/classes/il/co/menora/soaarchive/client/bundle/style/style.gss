@@ -1,0 +1,33 @@
+/********************************************************************************/
+/* FFU */
+/********************************************************************************/
+	@external resendButton;
+	.resendButton {
+			color: #ffffff;
+			background-color: #a4370f;
+			width: 100%;
+				
+	}
+	
+	@external infoPanel;
+	.infoPanel  {
+		font-family: Helvetica, Arial, sans-serif;
+		font-size: 14px;
+		font-weight: normal;
+		
+	}
+	@external infoPanelTop;
+	.infoPanelTop {
+				padding-top: 30px;
+	}
+	
+	@external closePopupButton;
+	.closePopupButton {
+		margin-top: 1px;
+     	margin-right: 1px;
+     	position:absolute;
+     	top:0;
+     	left:0;
+				
+	}
+	

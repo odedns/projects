@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>SaslConfigs.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">v3io-kafka-client</a> &gt; <a href="index.source.html" class="el_package">org.apache.kafka.common.config</a> &gt; <span class="el_source">SaslConfigs.java</span></div><h1>SaslConfigs.java</h1><pre class="source lang-java linenums">/**
+ * Licensed to the Apache Software Foundation (ASF) under one or more contributor license agreements. See the NOTICE
+ * file distributed with this work for additional information regarding copyright ownership. The ASF licenses this file
+ * to You under the Apache License, Version 2.0 (the &quot;License&quot;); you may not use this file except in compliance with the
+ * License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+ * an &quot;AS IS&quot; BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
+ */
+
+package org.apache.kafka.common.config;
+
+import java.util.Collections;
+import java.util.List;
+
+<span class="nc" id="L19">public class SaslConfigs {</span>
+    /*
+     * NOTE: DO NOT CHANGE EITHER CONFIG NAMES AS THESE ARE PART OF THE PUBLIC API AND CHANGE WILL BREAK USER CODE.
+     */
+    /** SASL mechanism configuration - standard mechanism names are listed &lt;a href=&quot;http://www.iana.org/assignments/sasl-mechanisms/sasl-mechanisms.xhtml&quot;&gt;here&lt;/a&gt;. */
+    public static final String SASL_MECHANISM = &quot;sasl.mechanism&quot;;
+    public static final String SASL_MECHANISM_DOC = &quot;SASL mechanism used for client connections. This may be any mechanism for which a security provider is available. GSSAPI is the default mechanism.&quot;;
+    public static final String GSSAPI_MECHANISM = &quot;GSSAPI&quot;;
+    public static final String DEFAULT_SASL_MECHANISM = GSSAPI_MECHANISM;
+
+    public static final String SASL_ENABLED_MECHANISMS = &quot;sasl.enabled.mechanisms&quot;;
+    public static final String SASL_ENABLED_MECHANISMS_DOC = &quot;The list of SASL mechanisms enabled in the Kafka server. &quot;
+        + &quot;The list may contain any mechanism for which a security provider is available. &quot;
+        + &quot;Only GSSAPI is enabled by default.&quot;;
+<span class="fc" id="L33">    public static final List&lt;String&gt; DEFAULT_SASL_ENABLED_MECHANISMS = Collections.singletonList(GSSAPI_MECHANISM);</span>
+
+    public static final String SASL_KERBEROS_SERVICE_NAME = &quot;sasl.kerberos.service.name&quot;;
+    public static final String SASL_KERBEROS_SERVICE_NAME_DOC = &quot;The Kerberos principal name that Kafka runs as. &quot;
+        + &quot;This can be defined either in Kafka's JAAS config or in Kafka's config.&quot;;
+
+    public static final String SASL_KERBEROS_KINIT_CMD = &quot;sasl.kerberos.kinit.cmd&quot;;
+    public static final String SASL_KERBEROS_KINIT_CMD_DOC = &quot;Kerberos kinit command path.&quot;;
+    public static final String DEFAULT_KERBEROS_KINIT_CMD = &quot;/usr/bin/kinit&quot;;
+
+    public static final String SASL_KERBEROS_TICKET_RENEW_WINDOW_FACTOR = &quot;sasl.kerberos.ticket.renew.window.factor&quot;;
+    public static final String SASL_KERBEROS_TICKET_RENEW_WINDOW_FACTOR_DOC = &quot;Login thread will sleep until the specified window factor of time from last refresh&quot;
+        + &quot; to ticket's expiry has been reached, at which time it will try to renew the ticket.&quot;;
+    public static final double DEFAULT_KERBEROS_TICKET_RENEW_WINDOW_FACTOR = 0.80;
+
+    public static final String SASL_KERBEROS_TICKET_RENEW_JITTER = &quot;sasl.kerberos.ticket.renew.jitter&quot;;
+    public static final String SASL_KERBEROS_TICKET_RENEW_JITTER_DOC = &quot;Percentage of random jitter added to the renewal time.&quot;;
+    public static final double DEFAULT_KERBEROS_TICKET_RENEW_JITTER = 0.05;
+
+    public static final String SASL_KERBEROS_MIN_TIME_BEFORE_RELOGIN = &quot;sasl.kerberos.min.time.before.relogin&quot;;
+    public static final String SASL_KERBEROS_MIN_TIME_BEFORE_RELOGIN_DOC = &quot;Login thread sleep time between refresh attempts.&quot;;
+    public static final long DEFAULT_KERBEROS_MIN_TIME_BEFORE_RELOGIN = 1 * 60 * 1000L;
+
+    public static final String SASL_KERBEROS_PRINCIPAL_TO_LOCAL_RULES = &quot;sasl.kerberos.principal.to.local.rules&quot;;
+    public static final String SASL_KERBEROS_PRINCIPAL_TO_LOCAL_RULES_DOC = &quot;A list of rules for mapping from principal names to short names (typically operating system usernames). &quot; +
+            &quot;The rules are evaluated in order and the first rule that matches a principal name is used to map it to a short name. Any later rules in the list are ignored. &quot; +
+            &quot;By default, principal names of the form {username}/{hostname}@{REALM} are mapped to {username}. &quot; +
+            &quot;For more details on the format please see &lt;a href=\&quot;#security_authz\&quot;&gt; security authorization and acls&lt;/a&gt;.&quot;;
+<span class="fc" id="L61">    public static final List&lt;String&gt; DEFAULT_SASL_KERBEROS_PRINCIPAL_TO_LOCAL_RULES = Collections.singletonList(&quot;DEFAULT&quot;);</span>
+
+    public static void addClientSaslSupport(ConfigDef config) {
+<span class="fc" id="L64">        config.define(SaslConfigs.SASL_KERBEROS_SERVICE_NAME, ConfigDef.Type.STRING, null, ConfigDef.Importance.MEDIUM, SaslConfigs.SASL_KERBEROS_SERVICE_NAME_DOC)</span>
+<span class="fc" id="L65">                .define(SaslConfigs.SASL_KERBEROS_KINIT_CMD, ConfigDef.Type.STRING, SaslConfigs.DEFAULT_KERBEROS_KINIT_CMD, ConfigDef.Importance.LOW, SaslConfigs.SASL_KERBEROS_KINIT_CMD_DOC)</span>
+<span class="fc" id="L66">                .define(SaslConfigs.SASL_KERBEROS_TICKET_RENEW_WINDOW_FACTOR, ConfigDef.Type.DOUBLE, SaslConfigs.DEFAULT_KERBEROS_TICKET_RENEW_WINDOW_FACTOR, ConfigDef.Importance.LOW, SaslConfigs.SASL_KERBEROS_TICKET_RENEW_WINDOW_FACTOR_DOC)</span>
+<span class="fc" id="L67">                .define(SaslConfigs.SASL_KERBEROS_TICKET_RENEW_JITTER, ConfigDef.Type.DOUBLE, SaslConfigs.DEFAULT_KERBEROS_TICKET_RENEW_JITTER, ConfigDef.Importance.LOW, SaslConfigs.SASL_KERBEROS_TICKET_RENEW_JITTER_DOC)</span>
+<span class="fc" id="L68">                .define(SaslConfigs.SASL_KERBEROS_MIN_TIME_BEFORE_RELOGIN, ConfigDef.Type.LONG, SaslConfigs.DEFAULT_KERBEROS_MIN_TIME_BEFORE_RELOGIN, ConfigDef.Importance.LOW, SaslConfigs.SASL_KERBEROS_MIN_TIME_BEFORE_RELOGIN_DOC)</span>
+<span class="fc" id="L69">                .define(SaslConfigs.SASL_MECHANISM, ConfigDef.Type.STRING, SaslConfigs.DEFAULT_SASL_MECHANISM, ConfigDef.Importance.MEDIUM, SaslConfigs.SASL_MECHANISM_DOC);</span>
+<span class="fc" id="L70">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.6.201602180812</span></div></body></html>

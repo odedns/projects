@@ -1,0 +1,4 @@
+#Tomcat publish data
+#Wed Jan 17 08:56:42 IST 2018
+org.eclipse.jst.jee.server\:SoaArchiveEjb=WEB-INF/lib/SoaArchiveEjb-1.0.0-SNAPSHOT.jar
+org.eclipse.jst.j2ee.server\:SoaArchiveClient=WEB-INF/lib/SoaArchiveClient-1.0.0-SNAPSHOT.jar

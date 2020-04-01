@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>ProducerConfig.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">v3io-kafka-client</a> &gt; <a href="index.source.html" class="el_package">org.apache.kafka.clients.producer</a> &gt; <span class="el_source">ProducerConfig.java</span></div><h1>ProducerConfig.java</h1><pre class="source lang-java linenums">/**
+ * Licensed to the Apache Software Foundation (ASF) under one or more contributor license agreements. See the NOTICE
+ * file distributed with this work for additional information regarding copyright ownership. The ASF licenses this file
+ * to You under the Apache License, Version 2.0 (the &quot;License&quot;); you may not use this file except in compliance with the
+ * License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+ * an &quot;AS IS&quot; BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
+ */
+package org.apache.kafka.clients.producer;
+
+import org.apache.kafka.clients.CommonClientConfigs;
+import org.apache.kafka.clients.producer.internals.DefaultPartitioner;
+import org.apache.kafka.common.config.AbstractConfig;
+import org.apache.kafka.common.config.ConfigDef;
+import org.apache.kafka.common.config.ConfigDef.Importance;
+import org.apache.kafka.common.config.ConfigDef.Type;
+import org.apache.kafka.common.serialization.Serializer;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+
+import static org.apache.kafka.common.config.ConfigDef.Range.atLeast;
+import static org.apache.kafka.common.config.ConfigDef.Range.between;
+import static org.apache.kafka.common.config.ConfigDef.ValidString.in;
+
+/**
+ * Configuration for the Kafka Producer. Documentation for these configurations can be found in the &lt;a
+ * href=&quot;http://kafka.apache.org/documentation.html#producerconfigs&quot;&gt;Kafka documentation&lt;/a&gt;
+ */
+public class ProducerConfig extends AbstractConfig {
+
+    /*
+     * NOTE: DO NOT CHANGE EITHER CONFIG STRINGS OR THEIR JAVA VARIABLE NAMES AS THESE ARE PART OF THE PUBLIC API AND
+     * CHANGE WILL BREAK USER CODE.
+     */
+
+    private static final ConfigDef CONFIG;
+
+
+    /** &lt;code&gt;batch.size&lt;/code&gt; */
+    public static final String BATCH_SIZE_CONFIG = &quot;batch.size&quot;;
+    private static final String BATCH_SIZE_DOC = &quot;The producer will attempt to batch records together into fewer requests whenever multiple records are being sent&quot;
+                                                 + &quot; to the same partition. This helps performance on both the client and the server. This configuration controls the &quot;
+                                                 + &quot;default batch size in bytes. &quot;
+                                                 + &quot;&lt;p&gt;&quot;
+                                                 + &quot;No attempt will be made to batch records larger than this size. &quot;
+                                                 + &quot;&lt;p&gt;&quot;
+                                                 + &quot;Requests sent to brokers will contain multiple batches, one for each partition with data available to be sent. &quot;
+                                                 + &quot;&lt;p&gt;&quot;
+                                                 + &quot;A small batch size will make batching less common and may reduce throughput (a batch size of zero will disable &quot;
+                                                 + &quot;batching entirely). A very large batch size may use memory a bit more wastefully as we will always allocate a &quot;
+                                                 + &quot;buffer of the specified batch size in anticipation of additional records.&quot;;
+
+    /** &lt;code&gt;acks&lt;/code&gt; */
+    public static final String ACKS_CONFIG = &quot;acks&quot;;
+    private static final String ACKS_DOC = &quot;The number of acknowledgments the producer requires the leader to have received before considering a request complete. This controls the &quot;
+                                           + &quot; durability of records that are sent. The following settings are allowed: &quot;
+                                           + &quot; &lt;ul&gt;&quot;
+                                           + &quot; &lt;li&gt;&lt;code&gt;acks=0&lt;/code&gt; If set to zero then the producer will not wait for any acknowledgment from the&quot;
+                                           + &quot; server at all. The record will be immediately added to the socket buffer and considered sent. No guarantee can be&quot;
+                                           + &quot; made that the server has received the record in this case, and the &lt;code&gt;retries&lt;/code&gt; configuration will not&quot;
+                                           + &quot; take effect (as the client won't generally know of any failures). The offset given back for each record will&quot;
+                                           + &quot; always be set to -1.&quot;
+                                           + &quot; &lt;li&gt;&lt;code&gt;acks=1&lt;/code&gt; This will mean the leader will write the record to its local log but will respond&quot;
+                                           + &quot; without awaiting full acknowledgement from all followers. In this case should the leader fail immediately after&quot;
+                                           + &quot; acknowledging the record but before the followers have replicated it then the record will be lost.&quot;
+                                           + &quot; &lt;li&gt;&lt;code&gt;acks=all&lt;/code&gt; This means the leader will wait for the full set of in-sync replicas to&quot;
+                                           + &quot; acknowledge the record. This guarantees that the record will not be lost as long as at least one in-sync replica&quot;
+                                           + &quot; remains alive. This is the strongest available guarantee. This is equivalent to the acks=-1 setting.&quot;;
+
+
+
+
+    /** &lt;code&gt;linger.ms&lt;/code&gt; */
+    public static final String LINGER_MS_CONFIG = &quot;linger.ms&quot;;
+    private static final String LINGER_MS_DOC = &quot;The producer groups together any records that arrive in between request transmissions into a single batched request. &quot;
+                                                + &quot;Normally this occurs only under load when records arrive faster than they can be sent out. However in some circumstances the client may want to &quot;
+                                                + &quot;reduce the number of requests even under moderate load. This setting accomplishes this by adding a small amount &quot;
+                                                + &quot;of artificial delay&amp;mdash;that is, rather than immediately sending out a record the producer will wait for up to &quot;
+                                                + &quot;the given delay to allow other records to be sent so that the sends can be batched together. This can be thought &quot;
+                                                + &quot;of as analogous to Nagle's algorithm in TCP. This setting gives the upper bound on the delay for batching: once &quot;
+                                                + &quot;we get &lt;code&gt;&quot; + BATCH_SIZE_CONFIG + &quot;&lt;/code&gt; worth of records for a partition it will be sent immediately regardless of this &quot;
+                                                + &quot;setting, however if we have fewer than this many bytes accumulated for this partition we will 'linger' for the &quot;
+                                                + &quot;specified time waiting for more records to show up. This setting defaults to 0 (i.e. no delay). Setting &lt;code&gt;&quot; + LINGER_MS_CONFIG + &quot;=5&lt;/code&gt;, &quot;
+                                                + &quot;for example, would have the effect of reducing the number of requests sent but would add up to 5ms of latency to records sent in the absense of load.&quot;;
+
+    /** &lt;code&gt;client.id&lt;/code&gt; */
+    public static final String CLIENT_ID_CONFIG = CommonClientConfigs.CLIENT_ID_CONFIG;
+
+
+    /** &lt;code&gt;max.request.size&lt;/code&gt; */
+    public static final String MAX_REQUEST_SIZE_CONFIG = &quot;max.request.size&quot;;
+    private static final String MAX_REQUEST_SIZE_DOC = &quot;The maximum size of a request in bytes. This is also effectively a cap on the maximum record size. Note that the server &quot;
+                                                       + &quot;has its own cap on record size which may be different from this. This setting will limit the number of record &quot;
+                                                       + &quot;batches the producer will send in a single request to avoid sending huge requests.&quot;;
+
+
+    /** &lt;code&gt;key.serializer&lt;/code&gt; */
+    public static final String KEY_SERIALIZER_CLASS_CONFIG = &quot;key.serializer&quot;;
+    public static final String KEY_SERIALIZER_CLASS_DOC = &quot;Serializer class for key that implements the &lt;code&gt;Serializer&lt;/code&gt; interface.&quot;;
+
+    /** &lt;code&gt;value.serializer&lt;/code&gt; */
+    public static final String VALUE_SERIALIZER_CLASS_CONFIG = &quot;value.serializer&quot;;
+    public static final String VALUE_SERIALIZER_CLASS_DOC = &quot;Serializer class for value that implements the &lt;code&gt;Serializer&lt;/code&gt; interface.&quot;;
+
+
+    /** &lt;code&gt;partitioner.class&lt;/code&gt; */
+    public static final String PARTITIONER_CLASS_CONFIG = &quot;partitioner.class&quot;;
+    private static final String PARTITIONER_CLASS_DOC = &quot;Partitioner class that implements the &lt;code&gt;Partitioner&lt;/code&gt; interface.&quot;;
+
+
+    /** &lt;code&gt;interceptor.classes&lt;/code&gt; */
+    public static final String INTERCEPTOR_CLASSES_CONFIG = &quot;interceptor.classes&quot;;
+    public static final String INTERCEPTOR_CLASSES_DOC = &quot;A list of classes to use as interceptors. &quot;
+                                                        + &quot;Implementing the &lt;code&gt;ProducerInterceptor&lt;/code&gt; interface allows you to intercept (and possibly mutate) the records &quot;
+                                                        + &quot;received by the producer before they are published to the Kafka cluster. By default, there are no interceptors.&quot;;
+
+    public static final String V3IO_CONTAINER_FACTORY =&quot;v3io.container.fs.client.factory&quot;;
+    public static final String V3IO_CONTAINER_FACTORY_DOC=&quot;internal v3io container factory&quot;;
+
+    static {
+<span class="nc" id="L128">        CONFIG = new ConfigDef()</span>
+<span class="nc" id="L129">                                .define(ACKS_CONFIG,</span>
+                                        Type.STRING,
+                                        &quot;1&quot;,
+<span class="nc" id="L132">                                        in(&quot;all&quot;, &quot;-1&quot;, &quot;0&quot;, &quot;1&quot;),</span>
+                                        Importance.HIGH,
+                                        ACKS_DOC)
+<span class="nc" id="L135">                                .define(V3IO_CONTAINER_FACTORY, Type.STRING, null, Importance.HIGH, V3IO_CONTAINER_FACTORY_DOC)</span>
+
+<span class="nc" id="L137">                                .define(BATCH_SIZE_CONFIG, Type.INT, 16384, atLeast(0), Importance.MEDIUM, BATCH_SIZE_DOC)</span>
+<span class="nc" id="L138">                                .define(LINGER_MS_CONFIG, Type.LONG, 0, atLeast(0L), Importance.MEDIUM, LINGER_MS_DOC)</span>
+<span class="nc" id="L139">                                .define(CLIENT_ID_CONFIG, Type.STRING, &quot;&quot;, Importance.MEDIUM, CommonClientConfigs.CLIENT_ID_DOC)</span>
+<span class="nc" id="L140">                                .define(MAX_REQUEST_SIZE_CONFIG,</span>
+                                        Type.INT,
+<span class="nc" id="L142">                                        1 * 1024 * 1024,</span>
+<span class="nc" id="L143">                                        atLeast(0),</span>
+                                        Importance.MEDIUM,
+                                        MAX_REQUEST_SIZE_DOC)
+<span class="nc" id="L146">                                .define(KEY_SERIALIZER_CLASS_CONFIG,</span>
+                                        Type.CLASS,
+                                        Importance.HIGH,
+                                        KEY_SERIALIZER_CLASS_DOC)
+<span class="nc" id="L150">                                .define(VALUE_SERIALIZER_CLASS_CONFIG,</span>
+                                        Type.CLASS,
+                                        Importance.HIGH,
+                                        VALUE_SERIALIZER_CLASS_DOC)
+                                /* default is set to be a bit lower than the server default (10 min), to avoid both client and server closing connection at same time */
+
+<span class="nc" id="L156">                                .define(PARTITIONER_CLASS_CONFIG,</span>
+                                        Type.CLASS,
+                                        DefaultPartitioner.class,
+                                        Importance.MEDIUM, PARTITIONER_CLASS_DOC)
+<span class="nc" id="L160">                                .define(INTERCEPTOR_CLASSES_CONFIG,</span>
+                                        Type.LIST,
+                                        null,
+                                        Importance.LOW,
+                                        INTERCEPTOR_CLASSES_DOC)
+<span class="nc" id="L165">                                .withClientSslSupport()</span>
+<span class="nc" id="L166">                                .withClientSaslSupport();</span>
+
+<span class="nc" id="L168">    }</span>
+
+    public static Map&lt;String, Object&gt; addSerializerToConfig(Map&lt;String, Object&gt; configs,
+                                                            Serializer&lt;?&gt; keySerializer, Serializer&lt;?&gt; valueSerializer) {
+<span class="nc" id="L172">        Map&lt;String, Object&gt; newConfigs = new HashMap&lt;String, Object&gt;();</span>
+<span class="nc" id="L173">        newConfigs.putAll(configs);</span>
+<span class="nc bnc" id="L174" title="All 2 branches missed.">        if (keySerializer != null)</span>
+<span class="nc" id="L175">            newConfigs.put(KEY_SERIALIZER_CLASS_CONFIG, keySerializer.getClass());</span>
+<span class="nc bnc" id="L176" title="All 2 branches missed.">        if (valueSerializer != null)</span>
+<span class="nc" id="L177">            newConfigs.put(VALUE_SERIALIZER_CLASS_CONFIG, valueSerializer.getClass());</span>
+<span class="nc" id="L178">        return newConfigs;</span>
+    }
+
+    public static Properties addSerializerToConfig(Properties properties,
+                                                   Serializer&lt;?&gt; keySerializer, Serializer&lt;?&gt; valueSerializer) {
+<span class="nc" id="L183">        Properties newProperties = new Properties();</span>
+<span class="nc" id="L184">        newProperties.putAll(properties);</span>
+<span class="nc bnc" id="L185" title="All 2 branches missed.">        if (keySerializer != null)</span>
+<span class="nc" id="L186">            newProperties.put(KEY_SERIALIZER_CLASS_CONFIG, keySerializer.getClass().getName());</span>
+<span class="nc bnc" id="L187" title="All 2 branches missed.">        if (valueSerializer != null)</span>
+<span class="nc" id="L188">            newProperties.put(VALUE_SERIALIZER_CLASS_CONFIG, valueSerializer.getClass().getName());</span>
+<span class="nc" id="L189">        return newProperties;</span>
+    }
+
+    ProducerConfig(Map&lt;?, ?&gt; props) {
+<span class="nc" id="L193">        super(CONFIG, props);</span>
+<span class="nc" id="L194">    }</span>
+
+    public static Set&lt;String&gt; configNames() {
+<span class="nc" id="L197">        return CONFIG.names();</span>
+    }
+
+    public static void main(String[] args) {
+<span class="nc" id="L201">        System.out.println(CONFIG.toHtmlTable());</span>
+<span class="nc" id="L202">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.6.201602180812</span></div></body></html>

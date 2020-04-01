@@ -1,0 +1,130 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>il.co.menora.soaarchive</groupId>
+		<artifactId>SoaArchive</artifactId>
+		<version>1.0.0-SNAPSHOT</version>
+		<relativePath>../SoaArchiveParent</relativePath>
+	</parent>
+
+	<artifactId>SoaArchiveEjb</artifactId>
+	<packaging>ejb</packaging>
+
+	<name>SoaArchiveEjb</name>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.apache.openejb</groupId>
+			<artifactId>javaee-api</artifactId>
+			<version>6.0-6</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-api</artifactId>
+			<version>2.6.2</version>
+			<scope>compile</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-core</artifactId>
+			<version>2.6.2</version>
+			<scope>compile</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>il.co.menora.soaarchive</groupId>
+			<artifactId>SoaArchiveClient</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>il.co.menora.soaarchive</groupId>
+			<artifactId>SoaArchiveClient</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		
+		<!-- https://mvnrepository.com/artifact/ojdbc/ojdbc -->
+		<dependency>
+    		<groupId>com.oracle</groupId>
+  			  <artifactId>ojdbc</artifactId>
+    			<version>14</version>
+    			<scope>system</scope>
+  			  <systemPath>${basedir}/lib/ojdbc6.jar</systemPath> <!-- must match file name -->
+			</dependency>
+		<dependency>
+			<groupId>com.ibm</groupId>
+			<artifactId>com.ibm.mq</artifactId>
+			<version>1.0</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/lib/com.ibm.mq.jar</systemPath>
+		</dependency>
+		<dependency>
+			<groupId>com.ibm</groupId>
+			<artifactId>com.ibm.mq.jmqi</artifactId>
+			<version>1.0</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/lib/com.ibm.mq.jmqi.jar</systemPath>
+		</dependency>
+		<dependency>
+			<groupId>com.ibm</groupId>
+			<artifactId>com.ibm.mq.pcf</artifactId>
+			<version>1.0</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/lib/com.ibm.mq.pcf.jar</systemPath>
+		</dependency>
+		<dependency>
+			<groupId>com.ibm</groupId>
+			<artifactId>com.ibm.mq.headers</artifactId>
+			<version>1.0</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/lib/com.ibm.mq.headers.jar</systemPath>
+		</dependency>
+		
+		<!-- https://mvnrepository.com/artifact/org.eclipse.jetty/jetty-xml -->
+		<dependency>
+    		<groupId>org.eclipse.jetty</groupId>
+    		<artifactId>jetty-xml</artifactId>
+    		<version>9.3.11.v20160721</version>
+		</dependency>
+		
+		
+<!-- https://mvnrepository.com/artifact/org.apache.openejb/openejb-client -->
+<dependency>
+    <groupId>org.apache.openejb</groupId>
+    <artifactId>openejb-client</artifactId>
+    <version>4.6.0</version>
+</dependency>
+
+<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
+<dependency>
+    <groupId>org.apache.commons</groupId>
+    <artifactId>commons-lang3</artifactId>
+    <version>3.4</version>
+</dependency>
+
+ 
+ 	<dependency>
+ 		<groupId>com.jcabi</groupId>
+ 		<artifactId>jcabi-xml</artifactId>
+ 		<version>0.14</version>
+ 	</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-ejb-plugin</artifactId>
+				<version>2.3</version>
+				<configuration>
+					<ejbVersion>3.1</ejbVersion>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+</project>

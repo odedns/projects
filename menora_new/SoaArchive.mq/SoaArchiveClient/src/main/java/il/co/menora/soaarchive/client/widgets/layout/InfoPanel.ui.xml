@@ -1,0 +1,24 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:t.layout="urn:import:il.co.menora.soaarchive.client.widgets.layout" xmlns:p="urn:import:com.vaadin.polymer.paper.widget">
+	<ui:with field='res'
+		type='il.co.menora.soaarchive.client.bundle.ClientResources' />
+
+	<g:HTMLPanel addStyleNames="AppPanel,appPanel">
+	            <g:HTMLPanel ui:field="bodyPanel"/>
+	
+	<!--  
+	            <p:PaperCard>
+            		<p:PaperItem>
+                      <p:PaperItemBody attributes="two-line" addStyleNames="layout vertical">
+                         <g:HTMLPanel ui:field="bodyPanel"/>
+                      </p:PaperItemBody>
+                  </p:PaperItem>
+                   </p:PaperCard>
+                   -->
+                   <div class="buttons">
+                   <p:PaperButton attributes="dialog-confirm autofocus" class="loginButton">Close</p:PaperButton>
+                   </div>
+                  
+	</g:HTMLPanel>
+</ui:UiBinder> 

@@ -1,0 +1,119 @@
+9
+
+dir
+0
+http://190.1.0.2/mnr_repos/ESB/SoaArchiveWeb/src/main/webapp/fontawesome-4.3.0/scss
+http://190.1.0.2/mnr_repos/ESB
+add
+
+
+
+
+
+
+
+svn:special svn:externals svn:needs-lock
+
+
+
+
+
+
+
+
+
+
+
+db950039-5e22-0510-97c5-1f4afcf59773
+
+_animated.scss
+file
+
+
+
+add
+
+_bordered-pulled.scss
+file
+
+
+
+add
+
+_core.scss
+file
+
+
+
+add
+
+_fixed-width.scss
+file
+
+
+
+add
+
+_icons.scss
+file
+
+
+
+add
+
+_larger.scss
+file
+
+
+
+add
+
+_list.scss
+file
+
+
+
+add
+
+_mixins.scss
+file
+
+
+
+add
+
+_path.scss
+file
+
+
+
+add
+
+_rotated-flipped.scss
+file
+
+
+
+add
+
+_stacked.scss
+file
+
+
+
+add
+
+_variables.scss
+file
+
+
+
+add
+
+font-awesome.scss
+file
+
+
+
+add
+

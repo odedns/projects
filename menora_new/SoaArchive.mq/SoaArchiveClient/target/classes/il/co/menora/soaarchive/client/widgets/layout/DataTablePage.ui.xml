@@ -1,0 +1,107 @@
+<ui:UiBinder xmlns:ui='urn:ui:com.google.gwt.uibinder'
+             xmlns:g='urn:import:com.google.gwt.user.client.ui'
+             xmlns:i='urn:import:com.vaadin.polymer.iron.widget'
+             xmlns:p='urn:import:com.vaadin.polymer.paper.widget'>
+   
+   
+    <g:HTMLPanel >
+	  
+	<style is="custom-style">
+  		paper-card {
+  			margin-left: 20px;
+  			width: 1300px;
+  			margin-top: 10px;
+  			margin-bottom: 10px;
+  			
+  		}
+	</style>
+   
+<p:PaperCard height="200px">
+		<div class="card-content" >
+	
+	<g:HorizontalPanel spacing="20">
+			<p:PaperInput label="Service Name" ui:field="serviceNameInput"/>
+				<p:PaperInput label="From Date" ui:field="fromDateInput"></p:PaperInput>
+				<p:PaperInput label="To Date" ui:field="toDateInput"></p:PaperInput>
+			
+			<g:VerticalPanel>
+				<p:PaperCheckbox ui:field="newCheckBox">NEW</p:PaperCheckbox>
+				<p:PaperCheckbox ui:field="cmCheckBox">CLOSED_MANUALLY</p:PaperCheckbox>
+				<p:PaperCheckbox ui:field="rrCheckBox">RERUN</p:PaperCheckbox>
+				<p:PaperCheckbox ui:field="rrbCheckBox">RERUN_FROM_BACK</p:PaperCheckbox>
+
+			</g:VerticalPanel>
+			<p:PaperCheckbox ui:field="expiredCheckBox">Show Expired Records</p:PaperCheckbox>
+			<g:VerticalPanel>
+				<p:PaperCheckbox ui:field="iibCheckBox">IIB</p:PaperCheckbox>
+				<p:PaperCheckbox ui:field="dpCheckBox">DP</p:PaperCheckbox>
+			</g:VerticalPanel>
+			
+		<p:PaperButton raised="true" ui:field="searchButton" class="loginButton" addStyleNames="colorful">Search</p:PaperButton>
+	</g:HorizontalPanel>
+	</div>	
+	</p:PaperCard> 
+
+	<g:Label ui:field="rowsLabel"/>
+<!--  -->	
+	<table id="example" class="mdl-data-table" cellspacing="0" width="100%">
+        <thead>
+            <tr>
+              <th><input type="checkbox"></input></th>
+                <th>Service Name</th>
+                <th>Service Type</th>
+                <th>Status</th>
+                <th>Status Time</th>
+                <th>Last User</th>
+                <th>Parent Id</th>
+                <th>Size</th>
+                <th>Archive Time</th>
+                <th>Error Time</th>
+                <th>Error Code</th>
+                <th>Error Message</th>
+                <th>Queue Name</th>
+                <th>QM Name</th>
+                <th>Num Reruns</th>
+                <th>Additional Info</th>
+            </tr>
+        </thead>
+        <tfoot id="tfooter">
+            <tr>
+                 <th></th>
+                <th>Service Name</th>
+                <th>Service Type</th>
+                <th>Status</th>
+                <th>Status Time</th>
+                <th>Last User</th>
+                <th>Parent Id</th>
+                <th>Size</th>
+                <th>Archive Time</th>
+                <th>Error Time</th>
+                <th>Error Code</th>
+                <th>Error Message</th>
+                <th>Queue Name</th>
+                <th>QM Name</th>
+                <th>Num Reruns</th>
+                <th>Additional Info</th>
+            </tr>
+        </tfoot>
+    </table>
+<g:HorizontalPanel spacing="20">
+   	<p:PaperButton ui:field="outgoingButton" class="loginButton" addStyleNames="colorful">Show Outgoing Messages</p:PaperButton>
+   	<p:PaperButton ui:field="sendButton" class="loginButton" addStyleNames="colorful">Send Selected Messages</p:PaperButton>
+   	<p:PaperButton ui:field="sendAllButton" class="loginButton" addStyleNames="colorful">Send All Messages</p:PaperButton>
+</g:HorizontalPanel>   	  
+   	  	
+   			 <p:PaperDialog ui:field="modalDlg" modal="true" width="400px" height="auto">
+            	<p:PaperDialogScrollable>   
+                <g:HTMLPanel ui:field="dialogPanel"></g:HTMLPanel>  
+                </p:PaperDialogScrollable>                 
+                </p:PaperDialog>
+                
+                <p:PaperDialog ui:field="progDlg" >
+                	<p align="center">Please Wait ....</p>
+               		<p:PaperProgress indeterminate="true"/>
+               		<br/>
+                </p:PaperDialog>
+    </g:HTMLPanel>
+</ui:UiBinder>

@@ -1,0 +1,90 @@
+<dom-module id="shared-styles">
+
+	<template>
+	
+		<style>
+			html.fullPage,
+			html.fullPage > body {
+				height: 100%;
+				margin: 0px;
+			}
+			
+			body {
+				direction: ltr;
+				font-size: 14px;
+			}
+			
+			.loginButton {
+				--paper-button: {
+					color: #ffffff;
+					background-color: #a4370f;
+					width: 100%;
+				};
+			}
+			
+			
+			paper-input { 
+				--paper-input-container-focus-color: #a4370f; 
+			}
+			
+			paper-card {
+				--paper-card: {
+					width: 360px;
+					padding: 40px;
+					margin: 10px;
+				};
+			    --paper-card-actions: {border-top: none;};
+			}
+			
+			paper-toolbar {
+				--paper-toolbar-background: #a4370f;
+			}
+			
+			paper-item {
+				--paper-item: {cursor:auto;};
+			}
+			
+			
+			
+			.test {
+				--paper-drawer-panel-drawer-container: {margin-top: 63px; margin-right: 254px;};
+			}
+			
+			
+			.paper-item-link {
+				color: inherit;
+				text-decoration: none;
+			}
+			
+			.flex-center-justified {
+				min-height: 100%;
+				@apply(--layout-vertical);
+				@apply(--layout-center-justified);
+				@apply(--layout-center);
+			}
+			
+			.appPanel {
+				padding-top: 20px;
+			}
+			
+			.menoraLogo {
+				padding-bottom: 5px;
+			}
+			
+			.tbl th, .tbl td {
+				text-align: left;
+				word-wrap: break-word;
+				white-space: pre-wrap;
+			}
+			
+			xmp {
+				word-wrap: break-word;
+				white-space: pre-wrap;
+			
+			}
+		
+			
+  
+		</style>
+	</template>
+</dom-module>

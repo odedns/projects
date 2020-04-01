@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE project>
+<project name="GWT-compile" default="build" basedir=".">
+	<target name="build" description="GWT compile">
+		<!-- Deleting previously compiled GWT output -->
+		<delete dir="../SoaArchiveWeb/src/main/webapp/SoaArchiveClient" failonerror="true" />
+		<delete dir="../SoaArchiveWeb/src/main/webapp/WEB-INF/deploy" failonerror="true" />
+
+		<!-- Compiling GWT -->
+		<java failonerror="true" fork="true" classname="com.google.gwt.dev.Compiler">
+			<classpath>
+				<pathelement location="src/main/java" />
+
+				<pathelement location="../../MenoraUiCommon/MenoraCommonClient/src/main/java" /> 
+				<pathelement path="${compile_classpath}" />
+			</classpath>
+			<jvmarg value="-Xmx512M" />
+			<arg value="-strict" />
+			<arg value="-localWorkers" />
+			<arg value="4" />
+			<arg value="-war" />
+			<arg value="../SoaArchiveWeb/src/main/webapp" />
+			<arg value="-strict" />
+			<!--<arg value="-style" />-->
+			<!--<arg value="PRETTY" />-->
+			<!--arg value="-logLevel" /-->
+			<!--arg value="DEBUG" /-->
+			<arg value="il.co.menora.soaarchive.SoaArchiveClient" />
+		</java>
+
+		<!-- Deleting GWT compiler cache -->
+		<delete dir="../SoaArchiveWeb/src/main/gwt-unitCache" failonerror="true" />
+	</target>
+</project>

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<section name="Workbench">
+	<section name=" org.eclipse.ui.texteditor.FindReplaceDialog">
+		<item value="false" key="isRegEx"/>
+		<item value="false" key="casesensitive"/>
+		<item value="false" key="wholeword"/>
+		<list key="findhistory">
+			<item value="pOutGoingGUID"/>
+		</list>
+		<list key="replacehistory">
+		</list>
+	</section>
+	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
+		<item value="false" key="isRegEx"/>
+		<item value="reloadButton" key="selection"/>
+		<item value="false" key="casesensitive"/>
+		<item value="false" key="incremental"/>
+		<item value="true" key="wrap"/>
+		<item value="false" key="wholeword"/>
+		<list key="findhistory">
+			<item value="reloadButton"/>
+			<item value="Continuous Integration is becoming the de-facto standard in the software development process.&#x0A;&#x0A;This course will explain the continuous integration concepts and provide an overview of the tools that are used in setting up a continuous integration process.&#x0A;&#x0A;It will also feature hands-on technical basics for a selected number of tools and provide hands-on training on how to combine these tools for setting up your continuous integration process.&#x0A;&#x0A;During this course we will do a technical overview of some continuous integration tools such as: git, maven, jenkins, Docker and Selenium.&#x0A;&#x0A;We will build together a continuous integration pipeline using this tool on a sample web application."/>
+			<item value="No message "/>
+			<item value="exist in conf"/>
+			<item value="exists in conf"/>
+			<item value="modalDlg"/>
+			<item value="sendButton"/>
+			<item value="createNew"/>
+			<item value="updateMs"/>
+			<item value="updateMe"/>
+			<item value="Popup"/>
+			<item value="dialogPanel"/>
+			<item value="response"/>
+			<item value="setNumPro"/>
+			<item value="numExpiredSkipped"/>
+		</list>
+		<list key="replacehistory">
+			<item value="sendExpired"/>
+		</list>
+	</section>
+	<section name="org.eclipse.ui.texteditor.FindReplaceDialog_dialogBounds">
+		<item value="344" key="DIALOG_WIDTH"/>
+		<item value="1|Ubuntu|11.0|0|GTK|1|" key="DIALOG_FONT_NAME"/>
+		<item value="435" key="DIALOG_HEIGHT"/>
+		<item value="936" key="DIALOG_X_ORIGIN"/>
+		<item value="106" key="DIALOG_Y_ORIGIN"/>
+	</section>
+</section>

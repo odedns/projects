@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="2.1" xmlns="http://xmlns.jcp.org/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
+
+	<persistence-unit name="taxreport.dev" transaction-type="RESOURCE_LOCAL">
+     <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+		<exclude-unlisted-classes>false</exclude-unlisted-classes>
+		<properties>
+			<property name="eclipselink.jdbc.batch-writing" value="JDBC"/>
+			<property name="javax.persistence.jdbc.url" value="jdbc:as400:AS4006;prompt=false;libraries=VHRF QGPL ELXS;"/>
+			<property name="javax.persistence.jdbc.user" value="K90NOTES"/>
+			<property name="javax.persistence.jdbc.password" value="K90NOTES"/>
+			<property name="javax.persistence.jdbc.driver" value="com.ibm.as400.access.AS400JDBCDriver"/>
+			<property name="eclipselink.jdbc.connections.initial" value="1"/> 
+            <property name="eclipselink.jdbc.connections.min" value="1"/> 
+            <property name="eclipselink.jdbc.connections.max" value="15"/> 
+            <property name="eclipselink.jdbc.connection_pool.read.shared" value="true"/> 
+            <property name="eclipselink.jdbc.read-connections.shared" value="true"/> 			
+		</properties>
+	</persistence-unit>
+	
+	
+	<persistence-unit name="taxreport.qa" transaction-type="RESOURCE_LOCAL">
+     <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+		<exclude-unlisted-classes>false</exclude-unlisted-classes>
+		<properties>
+			<property name="eclipselink.jdbc.batch-writing" value="JDBC"/>
+			<property name="javax.persistence.jdbc.url" value="jdbc:as400:AS4006;prompt=false;libraries=VHRF;"/>
+			<property name="javax.persistence.jdbc.user" value="K90NOTES"/>
+			<property name="javax.persistence.jdbc.password" value="K90NOTES"/>
+			<property name="javax.persistence.jdbc.driver" value="com.ibm.as400.access.AS400JDBCDriver"/>
+			<property name="eclipselink.jdbc.connections.initial" value="1"/> 
+            <property name="eclipselink.jdbc.connections.min" value="1"/> 
+            <property name="eclipselink.jdbc.connections.max" value="15"/> 
+            <property name="eclipselink.jdbc.connection_pool.read.shared" value="true"/> 
+            <property name="eclipselink.jdbc.read-connections.shared" value="true"/> 			
+			
+		</properties>
+	</persistence-unit>
+	
+</persistence>

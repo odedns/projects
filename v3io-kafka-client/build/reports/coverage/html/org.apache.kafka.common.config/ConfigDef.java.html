@@ -1,0 +1,1027 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>ConfigDef.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">v3io-kafka-client</a> &gt; <a href="index.source.html" class="el_package">org.apache.kafka.common.config</a> &gt; <span class="el_source">ConfigDef.java</span></div><h1>ConfigDef.java</h1><pre class="source lang-java linenums">/**
+ * Licensed to the Apache Software Foundation (ASF) under one or more contributor license agreements. See the NOTICE
+ * file distributed with this work for additional information regarding copyright ownership. The ASF licenses this file
+ * to You under the Apache License, Version 2.0 (the &quot;License&quot;); you may not use this file except in compliance with the
+ * License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+ * an &quot;AS IS&quot; BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
+ */
+package org.apache.kafka.common.config;
+
+import org.apache.kafka.common.config.types.Password;
+import org.apache.kafka.common.utils.Utils;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+
+/**
+ * This class is used for specifying the set of expected configurations. For each configuration, you can specify
+ * the name, the type, the default value, the documentation, the group information, the order in the group,
+ * the width of the configuration value and the name suitable for display in the UI.
+ *
+ * You can provide special validation logic used for single configuration validation by overriding {@link Validator}.
+ *
+ * Moreover, you can specify the dependents of a configuration. The valid values and visibility of a configuration
+ * may change according to the values of other configurations. You can override {@link Recommender} to get valid
+ * values and set visibility of a configuration given the current configuration values.
+ *
+ * &lt;p/&gt;
+ * To use the class:
+ * &lt;p/&gt;
+ * &lt;pre&gt;
+ * ConfigDef defs = new ConfigDef();
+ *
+ * defs.define(&amp;quot;config_with_default&amp;quot;, Type.STRING, &amp;quot;default string value&amp;quot;, &amp;quot;Configuration with default value.&amp;quot;);
+ * defs.define(&amp;quot;config_with_validator&amp;quot;, Type.INT, 42, Range.atLeast(0), &amp;quot;Configuration with user provided validator.&amp;quot;);
+ * defs.define(&amp;quot;config_with_dependents&amp;quot;, Type.INT, &amp;quot;Configuration with dependents.&amp;quot;, &amp;quot;group&amp;quot;, 1, &amp;quot;Config With Dependents&amp;quot;, Arrays.asList(&amp;quot;config_with_default;&amp;quot;,&amp;quot;config_with_validator&amp;quot;));
+ *
+ * Map&amp;lt;String, String&amp;gt; props = new HashMap&amp;lt;&amp;gt();
+ * props.put(&amp;quot;config_with_default&amp;quot;, &amp;quot;some value&amp;quot;);
+ * props.put(&amp;quot;config_with_dependents&amp;quot;, &amp;quot;some other value&amp;quot;);
+ * // will return &amp;quot;some value&amp;quot;
+ * Map&amp;lt;String, Object&amp;gt; configs = defs.parse(props);
+ * String someConfig = (String) configs.get(&amp;quot;config_with_default&amp;quot;);
+ * // will return default value of 42
+ * int anotherConfig = (Integer) configs.get(&amp;quot;config_with_validator&amp;quot;);
+ *
+ * To validate the full configuration, use:
+ * List&amp;lt;Config&amp;gt; configs = def.validate(props);
+ * The {@link Config} contains updated configuration information given the current configuration values.
+ * &lt;/pre&gt;
+ * &lt;p/&gt;
+ * This class can be used standalone or in combination with {@link AbstractConfig} which provides some additional
+ * functionality for accessing configs.
+ */
+<span class="fc" id="L69">public class ConfigDef {</span>
+
+<span class="fc" id="L71">    public static final Object NO_DEFAULT_VALUE = new String(&quot;&quot;);</span>
+
+<span class="fc" id="L73">    private final Map&lt;String, ConfigKey&gt; configKeys = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L74">    private final List&lt;String&gt; groups = new LinkedList&lt;&gt;();</span>
+    private Set&lt;String&gt; configsWithNoParent;
+
+    /**
+     * Returns unmodifiable set of properties names defined in this {@linkplain ConfigDef}
+     *
+     * @return new unmodifiable {@link Set} instance containing the keys
+     */
+    public Set&lt;String&gt; names() {
+<span class="nc" id="L83">        return Collections.unmodifiableSet(configKeys.keySet());</span>
+    }
+
+    /**
+     * Define a new configuration
+     * @param name          the name of the config parameter
+     * @param type          the type of the config
+     * @param defaultValue  the default value to use if this config isn't present
+     * @param validator     the validator to use in checking the correctness of the config
+     * @param importance    the importance of this config
+     * @param documentation the documentation string for the config
+     * @param group         the group this config belongs to
+     * @param orderInGroup  the order of this config in the group
+     * @param width         the width of the config
+     * @param displayName   the name suitable for display
+     * @param dependents    the configurations that are dependents of this configuration
+     * @param recommender   the recommender provides valid values given the parent configuration values
+     * @return This ConfigDef so you can chain calls
+     */
+    public ConfigDef define(String name, Type type, Object defaultValue, Validator validator, Importance importance, String documentation,
+                            String group, int orderInGroup, Width width, String displayName, List&lt;String&gt; dependents, Recommender recommender) {
+<span class="pc bpc" id="L104" title="1 of 2 branches missed.">        if (configKeys.containsKey(name)) {</span>
+<span class="nc" id="L105">            throw new ConfigException(&quot;Configuration &quot; + name + &quot; is defined twice.&quot;);</span>
+        }
+<span class="pc bpc" id="L107" title="3 of 4 branches missed.">        if (group != null &amp;&amp; !groups.contains(group)) {</span>
+<span class="nc" id="L108">            groups.add(group);</span>
+        }
+<span class="fc bfc" id="L110" title="All 2 branches covered.">        Object parsedDefault = defaultValue == NO_DEFAULT_VALUE ? NO_DEFAULT_VALUE : parseType(name, defaultValue, type);</span>
+<span class="fc" id="L111">        configKeys.put(name, new ConfigKey(name, type, parsedDefault, validator, importance, documentation, group, orderInGroup, width, displayName, dependents, recommender));</span>
+<span class="fc" id="L112">        return this;</span>
+    }
+
+    /**
+     * Define a new configuration with no custom recommender
+     * @param name          the name of the config parameter
+     * @param type          the type of the config
+     * @param defaultValue  the default value to use if this config isn't present
+     * @param validator     the validator to use in checking the correctness of the config
+     * @param importance    the importance of this config
+     * @param documentation the documentation string for the config
+     * @param group         the group this config belongs to
+     * @param orderInGroup  the order of this config in the group
+     * @param width         the width of the config
+     * @param displayName   the name suitable for display
+     * @param dependents    the configurations that are dependents of this configuration
+     * @return This ConfigDef so you can chain calls
+     */
+    public ConfigDef define(String name, Type type, Object defaultValue, Validator validator, Importance importance, String documentation,
+                            String group, int orderInGroup, Width width, String displayName, List&lt;String&gt; dependents) {
+<span class="fc" id="L132">        return define(name, type, defaultValue, validator, importance, documentation, group, orderInGroup, width, displayName, dependents, null);</span>
+    }
+
+    /**
+     * Define a new configuration with no dependents
+     * @param name          the name of the config parameter
+     * @param type          the type of the config
+     * @param defaultValue  the default value to use if this config isn't present
+     * @param validator     the validator to use in checking the correctness of the config
+     * @param importance    the importance of this config
+     * @param documentation the documentation string for the config
+     * @param group         the group this config belongs to
+     * @param orderInGroup  the order of this config in the group
+     * @param width         the width of the config
+     * @param displayName   the name suitable for display
+     * @param recommender   the recommender provides valid values given the parent configuration values
+     * @return This ConfigDef so you can chain calls
+     */
+    public ConfigDef define(String name, Type type, Object defaultValue, Validator validator, Importance importance, String documentation,
+                            String group, int orderInGroup, Width width, String displayName, Recommender recommender) {
+<span class="nc" id="L152">        return define(name, type, defaultValue, validator, importance, documentation, group, orderInGroup, width, displayName, Collections.&lt;String&gt;emptyList(), recommender);</span>
+    }
+
+    /**
+     * Define a new configuration with no dependents and no custom recommender
+     * @param name          the name of the config parameter
+     * @param type          the type of the config
+     * @param defaultValue  the default value to use if this config isn't present
+     * @param validator     the validator to use in checking the correctness of the config
+     * @param importance    the importance of this config
+     * @param documentation the documentation string for the config
+     * @param group         the group this config belongs to
+     * @param orderInGroup  the order of this config in the group
+     * @param width         the width of the config
+     * @param displayName   the name suitable for display
+     * @return This ConfigDef so you can chain calls
+     */
+    public ConfigDef define(String name, Type type, Object defaultValue, Validator validator, Importance importance, String documentation,
+                            String group, int orderInGroup, Width width, String displayName) {
+<span class="fc" id="L171">        return define(name, type, defaultValue, validator, importance, documentation, group, orderInGroup, width, displayName, Collections.&lt;String&gt;emptyList());</span>
+    }
+
+    /**
+     * Define a new configuration with no special validation logic
+     * @param name          the name of the config parameter
+     * @param type          the type of the config
+     * @param defaultValue  the default value to use if this config isn't present
+     * @param importance    the importance of this config
+     * @param documentation the documentation string for the config
+     * @param group         the group this config belongs to
+     * @param orderInGroup  the order of this config in the group
+     * @param width         the width of the config
+     * @param displayName   the name suitable for display
+     * @param dependents    the configurations that are dependents of this configuration
+     * @param recommender   the recommender provides valid values given the parent configuration values
+     * @return This ConfigDef so you can chain calls
+     */
+    public ConfigDef define(String name, Type type, Object defaultValue, Importance importance, String documentation,
+                            String group, int orderInGroup, Width width, String displayName, List&lt;String&gt; dependents, Recommender recommender) {
+<span class="nc" id="L191">        return define(name, type, defaultValue, null, importance, documentation, group, orderInGroup, width, displayName, dependents, recommender);</span>
+    }
+
+    /**
+     * Define a new configuration with no special validation logic and no custom recommender
+     * @param name          the name of the config parameter
+     * @param type          the type of the config
+     * @param defaultValue  the default value to use if this config isn't present
+     * @param importance    the importance of this config
+     * @param documentation the documentation string for the config
+     * @param group         the group this config belongs to
+     * @param orderInGroup  the order of this config in the group
+     * @param width         the width of the config
+     * @param displayName   the name suitable for display
+     * @param dependents    the configurations that are dependents of this configuration
+     * @return This ConfigDef so you can chain calls
+     */
+    public ConfigDef define(String name, Type type, Object defaultValue, Importance importance, String documentation,
+                            String group, int orderInGroup, Width width, String displayName, List&lt;String&gt; dependents) {
+<span class="nc" id="L210">        return define(name, type, defaultValue, null, importance, documentation, group, orderInGroup, width, displayName, dependents, null);</span>
+    }
+
+    /**
+     * Define a new configuration with no special validation logic and no custom recommender
+     * @param name          the name of the config parameter
+     * @param type          the type of the config
+     * @param defaultValue  the default value to use if this config isn't present
+     * @param importance    the importance of this config
+     * @param documentation the documentation string for the config
+     * @param group         the group this config belongs to
+     * @param orderInGroup  the order of this config in the group
+     * @param width         the width of the config
+     * @param displayName   the name suitable for display
+     * @param recommender   the recommender provides valid values given the parent configuration values
+     * @return This ConfigDef so you can chain calls
+     */
+    public ConfigDef define(String name, Type type, Object defaultValue, Importance importance, String documentation,
+                            String group, int orderInGroup, Width width, String displayName, Recommender recommender) {
+<span class="nc" id="L229">        return define(name, type, defaultValue, null, importance, documentation, group, orderInGroup, width, displayName, Collections.&lt;String&gt;emptyList(), recommender);</span>
+    }
+
+    /**
+     * Define a new configuration with no special validation logic, not dependents and no custom recommender
+     * @param name          the name of the config parameter
+     * @param type          the type of the config
+     * @param defaultValue  the default value to use if this config isn't present
+     * @param importance    the importance of this config
+     * @param documentation the documentation string for the config
+     * @param group         the group this config belongs to
+     * @param orderInGroup  the order of this config in the group
+     * @param width         the width of the config
+     * @param displayName   the name suitable for display
+     * @return This ConfigDef so you can chain calls
+     */
+    public ConfigDef define(String name, Type type, Object defaultValue, Importance importance, String documentation,
+                            String group, int orderInGroup, Width width, String displayName) {
+<span class="nc" id="L247">        return define(name, type, defaultValue, null, importance, documentation, group, orderInGroup, width, displayName, Collections.&lt;String&gt;emptyList());</span>
+    }
+
+    /**
+     * Define a new configuration with no default value and no special validation logic
+     * @param name          the name of the config parameter
+     * @param type          the type of the config
+     * @param importance    the importance of this config
+     * @param documentation the documentation string for the config
+     * @param group         the group this config belongs to
+     * @param orderInGroup  the order of this config in the group
+     * @param width         the width of the config
+     * @param displayName   the name suitable for display
+     * @param dependents    the configurations that are dependents of this configuration
+     * @param recommender   the recommender provides valid values given the parent configuration value
+     * @return This ConfigDef so you can chain calls
+     */
+    public ConfigDef define(String name, Type type, Importance importance, String documentation, String group, int orderInGroup,
+                            Width width, String displayName, List&lt;String&gt; dependents, Recommender recommender) {
+<span class="nc" id="L266">        return define(name, type, NO_DEFAULT_VALUE, null, importance, documentation, group, orderInGroup, width, displayName, dependents, recommender);</span>
+    }
+
+    /**
+     * Define a new configuration with no default value, no special validation logic and no custom recommender
+     * @param name          the name of the config parameter
+     * @param type          the type of the config
+     * @param importance    the importance of this config
+     * @param documentation the documentation string for the config
+     * @param group         the group this config belongs to
+     * @param orderInGroup  the order of this config in the group
+     * @param width         the width of the config
+     * @param displayName   the name suitable for display
+     * @param dependents    the configurations that are dependents of this configuration
+     * @return This ConfigDef so you can chain calls
+     */
+    public ConfigDef define(String name, Type type, Importance importance, String documentation, String group, int orderInGroup,
+                            Width width, String displayName, List&lt;String&gt; dependents) {
+<span class="nc" id="L284">        return define(name, type, NO_DEFAULT_VALUE, null, importance, documentation, group, orderInGroup, width, displayName, dependents, null);</span>
+    }
+
+    /**
+     * Define a new configuration with no default value, no special validation logic and no custom recommender
+     * @param name          the name of the config parameter
+     * @param type          the type of the config
+     * @param importance    the importance of this config
+     * @param documentation the documentation string for the config
+     * @param group         the group this config belongs to
+     * @param orderInGroup  the order of this config in the group
+     * @param width         the width of the config
+     * @param displayName   the name suitable for display
+     * @param recommender   the recommender provides valid values given the parent configuration value
+     * @return This ConfigDef so you can chain calls
+     */
+    public ConfigDef define(String name, Type type, Importance importance, String documentation, String group, int orderInGroup,
+                            Width width, String displayName, Recommender recommender) {
+<span class="nc" id="L302">        return define(name, type, NO_DEFAULT_VALUE, null, importance, documentation, group, orderInGroup, width, displayName, Collections.&lt;String&gt;emptyList(), recommender);</span>
+    }
+
+    /**
+     * Define a new configuration with no default value, no special validation logic, no dependents and no custom recommender
+     * @param name          the name of the config parameter
+     * @param type          the type of the config
+     * @param importance    the importance of this config
+     * @param documentation the documentation string for the config
+     * @param group         the group this config belongs to
+     * @param orderInGroup  the order of this config in the group
+     * @param width         the width of the config
+     * @param displayName   the name suitable for display
+     * @return This ConfigDef so you can chain calls
+     */
+    public ConfigDef define(String name, Type type, Importance importance, String documentation, String group, int orderInGroup,
+                            Width width, String displayName) {
+<span class="nc" id="L319">        return define(name, type, NO_DEFAULT_VALUE, null, importance, documentation, group, orderInGroup, width, displayName, Collections.&lt;String&gt;emptyList());</span>
+    }
+
+    /**
+     * Define a new configuration with no group, no order in group, no width, no display name, no dependents and no custom recommender
+     * @param name          the name of the config parameter
+     * @param type          the type of the config
+     * @param defaultValue  the default value to use if this config isn't present
+     * @param validator     the validator to use in checking the correctness of the config
+     * @param importance    the importance of this config
+     * @param documentation the documentation string for the config
+     * @return This ConfigDef so you can chain calls
+     */
+    public ConfigDef define(String name, Type type, Object defaultValue, Validator validator, Importance importance, String documentation) {
+<span class="fc" id="L333">        return define(name, type, defaultValue, validator, importance, documentation, null, -1, Width.NONE, name);</span>
+    }
+
+    /**
+     * Define a new configuration with no special validation logic
+     * @param name          The name of the config parameter
+     * @param type          The type of the config
+     * @param defaultValue  The default value to use if this config isn't present
+     * @param importance    The importance of this config: is this something you will likely need to change.
+     * @param documentation The documentation string for the config
+     * @return This ConfigDef so you can chain calls
+     */
+    public ConfigDef define(String name, Type type, Object defaultValue, Importance importance, String documentation) {
+<span class="fc" id="L346">        return define(name, type, defaultValue, null, importance, documentation);</span>
+    }
+
+    /**
+     * Define a new configuration with no default value and no special validation logic
+     * @param name          The name of the config parameter
+     * @param type          The type of the config
+     * @param importance    The importance of this config: is this something you will likely need to change.
+     * @param documentation The documentation string for the config
+     * @return This ConfigDef so you can chain calls
+     */
+    public ConfigDef define(String name, Type type, Importance importance, String documentation) {
+<span class="fc" id="L358">        return define(name, type, NO_DEFAULT_VALUE, null, importance, documentation);</span>
+    }
+
+    /**
+     * Get the configuration keys
+     * @return a map containing all configuration keys
+     */
+    public Map&lt;String, ConfigKey&gt; configKeys() {
+<span class="nc" id="L366">        return configKeys;</span>
+    }
+
+    /**
+     * Get the groups for the configuration
+     * @return a list of group names
+     */
+    public List&lt;String&gt; groups() {
+<span class="nc" id="L374">        return groups;</span>
+    }
+
+    /**
+     * Add standard SSL client configuration options.
+     * @return this
+     */
+    public ConfigDef withClientSslSupport() {
+<span class="fc" id="L382">        SslConfigs.addClientSslSupport(this);</span>
+<span class="fc" id="L383">        return this;</span>
+    }
+
+    /**
+     * Add standard SASL client configuration options.
+     * @return this
+     */
+    public ConfigDef withClientSaslSupport() {
+<span class="fc" id="L391">        SaslConfigs.addClientSaslSupport(this);</span>
+<span class="fc" id="L392">        return this;</span>
+    }
+
+    /**
+     * Parse and validate configs against this configuration definition. The input is a map of configs. It is expected
+     * that the keys of the map are strings, but the values can either be strings or they may already be of the
+     * appropriate type (int, string, etc). This will work equally well with either java.util.Properties instances or a
+     * programmatically constructed map.
+     *
+     * @param props The configs to parse and validate.
+     * @return Parsed and validated configs. The key will be the config name and the value will be the value parsed into
+     * the appropriate type (int, string, etc).
+     */
+    public Map&lt;String, Object&gt; parse(Map&lt;?, ?&gt; props) {
+        // Check all configurations are defined
+<span class="fc" id="L407">        List&lt;String&gt; undefinedConfigKeys = undefinedDependentConfigs();</span>
+<span class="pc bpc" id="L408" title="1 of 2 branches missed.">        if (!undefinedConfigKeys.isEmpty()) {</span>
+<span class="nc" id="L409">            String joined = Utils.join(undefinedConfigKeys, &quot;,&quot;);</span>
+<span class="nc" id="L410">            throw new ConfigException(&quot;Some configurations in are referred in the dependents, but not defined: &quot; + joined);</span>
+        }
+        // parse all known keys
+<span class="fc" id="L413">        Map&lt;String, Object&gt; values = new HashMap&lt;&gt;();</span>
+<span class="pc bpc" id="L414" title="1 of 2 branches missed.">        for (ConfigKey key : configKeys.values()) {</span>
+            Object value;
+            // props map contains setting - assign ConfigKey value
+<span class="fc bfc" id="L417" title="All 2 branches covered.">            if (props.containsKey(key.name)) {</span>
+<span class="fc" id="L418">                value = parseType(key.name, props.get(key.name), key.type);</span>
+                // props map doesn't contain setting, the key is required because no default value specified - its an error
+<span class="pc bpc" id="L420" title="1 of 2 branches missed.">            } else if (key.defaultValue == NO_DEFAULT_VALUE) {</span>
+<span class="nc" id="L421">                throw new ConfigException(&quot;Missing required configuration \&quot;&quot; + key.name + &quot;\&quot; which has no default value.&quot;);</span>
+            } else {
+                // otherwise assign setting its default value
+<span class="fc" id="L424">                value = key.defaultValue;</span>
+            }
+<span class="fc bfc" id="L426" title="All 2 branches covered.">            if (key.validator != null) {</span>
+<span class="fc" id="L427">                key.validator.ensureValid(key.name, value);</span>
+            }
+<span class="fc" id="L429">            values.put(key.name, value);</span>
+<span class="fc" id="L430">        }</span>
+<span class="nc" id="L431">        return values;</span>
+    }
+
+    /**
+     * Validate the current configuration values with the configuration definition.
+     * @param props the current configuration values
+     * @return List of Config, each Config contains the updated configuration information given
+     * the current configuration values.
+     */
+    public List&lt;ConfigValue&gt; validate(Map&lt;String, String&gt; props) {
+<span class="nc" id="L441">        Map&lt;String, ConfigValue&gt; configValues = new HashMap&lt;&gt;();</span>
+<span class="nc bnc" id="L442" title="All 2 branches missed.">        for (String name: configKeys.keySet()) {</span>
+<span class="nc" id="L443">            configValues.put(name, new ConfigValue(name));</span>
+<span class="nc" id="L444">        }</span>
+
+<span class="nc" id="L446">        List&lt;String&gt; undefinedConfigKeys = undefinedDependentConfigs();</span>
+<span class="nc bnc" id="L447" title="All 2 branches missed.">        for (String undefinedConfigKey: undefinedConfigKeys) {</span>
+<span class="nc" id="L448">            ConfigValue undefinedConfigValue = new ConfigValue(undefinedConfigKey);</span>
+<span class="nc" id="L449">            undefinedConfigValue.addErrorMessage(undefinedConfigKey + &quot; is referred in the dependents, but not defined.&quot;);</span>
+<span class="nc" id="L450">            undefinedConfigValue.visible(false);</span>
+<span class="nc" id="L451">            configValues.put(undefinedConfigKey, undefinedConfigValue);</span>
+<span class="nc" id="L452">        }</span>
+
+<span class="nc" id="L454">        Map&lt;String, Object&gt; parsed = parseForValidate(props, configValues);</span>
+<span class="nc" id="L455">        return validate(parsed, configValues);</span>
+    }
+
+    // package accessible for testing
+    Map&lt;String, Object&gt; parseForValidate(Map&lt;String, String&gt; props, Map&lt;String, ConfigValue&gt; configValues) {
+<span class="nc" id="L460">        Map&lt;String, Object&gt; parsed = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L461">        Set&lt;String&gt; configsWithNoParent = getConfigsWithNoParent();</span>
+<span class="nc bnc" id="L462" title="All 2 branches missed.">        for (String name: configsWithNoParent) {</span>
+<span class="nc" id="L463">            parseForValidate(name, props, parsed, configValues);</span>
+<span class="nc" id="L464">        }</span>
+<span class="nc" id="L465">        return parsed;</span>
+    }
+
+
+    private List&lt;ConfigValue&gt; validate(Map&lt;String, Object&gt; parsed, Map&lt;String, ConfigValue&gt; configValues) {
+<span class="nc" id="L470">        Set&lt;String&gt; configsWithNoParent = getConfigsWithNoParent();</span>
+<span class="nc bnc" id="L471" title="All 2 branches missed.">        for (String name: configsWithNoParent) {</span>
+<span class="nc" id="L472">            validate(name, parsed, configValues);</span>
+<span class="nc" id="L473">        }</span>
+<span class="nc" id="L474">        return new LinkedList&lt;&gt;(configValues.values());</span>
+    }
+
+    private List&lt;String&gt; undefinedDependentConfigs() {
+<span class="fc" id="L478">        Set&lt;String&gt; undefinedConfigKeys = new HashSet&lt;&gt;();</span>
+<span class="fc bfc" id="L479" title="All 2 branches covered.">        for (String configName: configKeys.keySet()) {</span>
+<span class="fc" id="L480">            ConfigKey configKey = configKeys.get(configName);</span>
+<span class="fc" id="L481">            List&lt;String&gt; dependents = configKey.dependents;</span>
+<span class="pc bpc" id="L482" title="1 of 2 branches missed.">            for (String dependent: dependents) {</span>
+<span class="nc bnc" id="L483" title="All 2 branches missed.">                if (!configKeys.containsKey(dependent)) {</span>
+<span class="nc" id="L484">                    undefinedConfigKeys.add(dependent);</span>
+                }
+<span class="nc" id="L486">            }</span>
+<span class="fc" id="L487">        }</span>
+<span class="fc" id="L488">        return new LinkedList&lt;&gt;(undefinedConfigKeys);</span>
+    }
+
+    private Set&lt;String&gt; getConfigsWithNoParent() {
+<span class="nc bnc" id="L492" title="All 2 branches missed.">        if (this.configsWithNoParent != null) {</span>
+<span class="nc" id="L493">            return this.configsWithNoParent;</span>
+        }
+<span class="nc" id="L495">        Set&lt;String&gt; configsWithParent = new HashSet&lt;&gt;();</span>
+
+<span class="nc bnc" id="L497" title="All 2 branches missed.">        for (ConfigKey configKey: configKeys.values()) {</span>
+<span class="nc" id="L498">            List&lt;String&gt; dependents = configKey.dependents;</span>
+<span class="nc" id="L499">            configsWithParent.addAll(dependents);</span>
+<span class="nc" id="L500">        }</span>
+
+<span class="nc" id="L502">        Set&lt;String&gt; configs = new HashSet&lt;&gt;(configKeys.keySet());</span>
+<span class="nc" id="L503">        configs.removeAll(configsWithParent);</span>
+<span class="nc" id="L504">        this.configsWithNoParent = configs;</span>
+<span class="nc" id="L505">        return configs;</span>
+    }
+
+    private void parseForValidate(String name, Map&lt;String, String&gt; props, Map&lt;String, Object&gt; parsed, Map&lt;String, ConfigValue&gt; configs) {
+<span class="nc bnc" id="L509" title="All 2 branches missed.">        if (!configKeys.containsKey(name)) {</span>
+<span class="nc" id="L510">            return;</span>
+        }
+<span class="nc" id="L512">        ConfigKey key = configKeys.get(name);</span>
+<span class="nc" id="L513">        ConfigValue config = configs.get(name);</span>
+
+<span class="nc" id="L515">        Object value = null;</span>
+<span class="nc bnc" id="L516" title="All 2 branches missed.">        if (props.containsKey(key.name)) {</span>
+            try {
+<span class="nc" id="L518">                value = parseType(key.name, props.get(key.name), key.type);</span>
+<span class="nc" id="L519">            } catch (ConfigException e) {</span>
+<span class="nc" id="L520">                config.addErrorMessage(e.getMessage());</span>
+<span class="nc" id="L521">            }</span>
+<span class="nc bnc" id="L522" title="All 2 branches missed.">        } else if (key.defaultValue == NO_DEFAULT_VALUE) {</span>
+<span class="nc" id="L523">            config.addErrorMessage(&quot;Missing required configuration \&quot;&quot; + key.name + &quot;\&quot; which has no default value.&quot;);</span>
+        } else {
+<span class="nc" id="L525">            value = key.defaultValue;</span>
+        }
+
+<span class="nc bnc" id="L528" title="All 2 branches missed.">        if (key.validator != null) {</span>
+            try {
+<span class="nc" id="L530">                key.validator.ensureValid(key.name, value);</span>
+<span class="nc" id="L531">            } catch (ConfigException e) {</span>
+<span class="nc" id="L532">                config.addErrorMessage(e.getMessage());</span>
+<span class="nc" id="L533">            }</span>
+        }
+<span class="nc" id="L535">        config.value(value);</span>
+<span class="nc" id="L536">        parsed.put(name, value);</span>
+<span class="nc bnc" id="L537" title="All 2 branches missed.">        for (String dependent: key.dependents) {</span>
+<span class="nc" id="L538">            parseForValidate(dependent, props, parsed, configs);</span>
+<span class="nc" id="L539">        }</span>
+<span class="nc" id="L540">    }</span>
+
+    private void validate(String name, Map&lt;String, Object&gt; parsed, Map&lt;String, ConfigValue&gt; configs) {
+<span class="nc bnc" id="L543" title="All 2 branches missed.">        if (!configKeys.containsKey(name)) {</span>
+<span class="nc" id="L544">            return;</span>
+        }
+<span class="nc" id="L546">        ConfigKey key = configKeys.get(name);</span>
+<span class="nc" id="L547">        ConfigValue config = configs.get(name);</span>
+        List&lt;Object&gt; recommendedValues;
+<span class="nc bnc" id="L549" title="All 2 branches missed.">        if (key.recommender != null) {</span>
+            try {
+<span class="nc" id="L551">                recommendedValues = key.recommender.validValues(name, parsed);</span>
+<span class="nc" id="L552">                List&lt;Object&gt; originalRecommendedValues = config.recommendedValues();</span>
+<span class="nc bnc" id="L553" title="All 2 branches missed.">                if (!originalRecommendedValues.isEmpty()) {</span>
+<span class="nc" id="L554">                    Set&lt;Object&gt; originalRecommendedValueSet = new HashSet&lt;&gt;(originalRecommendedValues);</span>
+<span class="nc" id="L555">                    Iterator&lt;Object&gt; it = recommendedValues.iterator();</span>
+<span class="nc bnc" id="L556" title="All 2 branches missed.">                    while (it.hasNext()) {</span>
+<span class="nc" id="L557">                        Object o = it.next();</span>
+<span class="nc bnc" id="L558" title="All 2 branches missed.">                        if (!originalRecommendedValueSet.contains(o)) {</span>
+<span class="nc" id="L559">                            it.remove();</span>
+                        }
+<span class="nc" id="L561">                    }</span>
+                }
+<span class="nc" id="L563">                config.recommendedValues(recommendedValues);</span>
+<span class="nc" id="L564">                config.visible(key.recommender.visible(name, parsed));</span>
+<span class="nc" id="L565">            } catch (ConfigException e) {</span>
+<span class="nc" id="L566">                config.addErrorMessage(e.getMessage());</span>
+<span class="nc" id="L567">            }</span>
+        }
+
+<span class="nc" id="L570">        configs.put(name, config);</span>
+<span class="nc bnc" id="L571" title="All 2 branches missed.">        for (String dependent: key.dependents) {</span>
+<span class="nc" id="L572">            validate(dependent, parsed, configs);</span>
+<span class="nc" id="L573">        }</span>
+<span class="nc" id="L574">    }</span>
+
+    /**
+     * Parse a value according to its expected type.
+     * @param name  The config name
+     * @param value The config value
+     * @param type  The expected type
+     * @return The parsed object
+     */
+    private Object parseType(String name, Object value, Type type) {
+        try {
+<span class="fc bfc" id="L585" title="All 2 branches covered.">            if (value == null) return null;</span>
+
+<span class="fc" id="L587">            String trimmed = null;</span>
+<span class="fc bfc" id="L588" title="All 2 branches covered.">            if (value instanceof String)</span>
+<span class="fc" id="L589">                trimmed = ((String) value).trim();</span>
+
+<span class="pc bpc" id="L591" title="3 of 10 branches missed.">            switch (type) {</span>
+                case BOOLEAN:
+<span class="pc bpc" id="L593" title="1 of 2 branches missed.">                    if (value instanceof String) {</span>
+<span class="nc bnc" id="L594" title="All 2 branches missed.">                        if (trimmed.equalsIgnoreCase(&quot;true&quot;))</span>
+<span class="nc" id="L595">                            return true;</span>
+<span class="nc bnc" id="L596" title="All 2 branches missed.">                        else if (trimmed.equalsIgnoreCase(&quot;false&quot;))</span>
+<span class="nc" id="L597">                            return false;</span>
+                        else
+<span class="nc" id="L599">                            throw new ConfigException(name, value, &quot;Expected value to be either true or false&quot;);</span>
+<span class="pc bpc" id="L600" title="1 of 2 branches missed.">                    } else if (value instanceof Boolean)</span>
+<span class="fc" id="L601">                        return value;</span>
+                    else
+<span class="nc" id="L603">                        throw new ConfigException(name, value, &quot;Expected value to be either true or false&quot;);</span>
+                case PASSWORD:
+<span class="nc bnc" id="L605" title="All 2 branches missed.">                    if (value instanceof Password)</span>
+<span class="nc" id="L606">                        return value;</span>
+<span class="nc bnc" id="L607" title="All 2 branches missed.">                    else if (value instanceof String)</span>
+<span class="nc" id="L608">                        return new Password(trimmed);</span>
+                    else
+<span class="nc" id="L610">                        throw new ConfigException(name, value, &quot;Expected value to be a string, but it was a &quot; + value.getClass().getName());</span>
+                case STRING:
+<span class="pc bpc" id="L612" title="1 of 2 branches missed.">                    if (value instanceof String)</span>
+<span class="fc" id="L613">                        return trimmed;</span>
+                    else
+<span class="nc" id="L615">                        throw new ConfigException(name, value, &quot;Expected value to be a string, but it was a &quot; + value.getClass().getName());</span>
+                case INT:
+<span class="pc bpc" id="L617" title="1 of 2 branches missed.">                    if (value instanceof Integer) {</span>
+<span class="fc" id="L618">                        return (Integer) value;</span>
+<span class="nc bnc" id="L619" title="All 2 branches missed.">                    } else if (value instanceof String) {</span>
+<span class="nc" id="L620">                        return Integer.parseInt(trimmed);</span>
+                    } else {
+<span class="nc" id="L622">                        throw new ConfigException(name, value, &quot;Expected value to be an number.&quot;);</span>
+                    }
+                case SHORT:
+<span class="nc bnc" id="L625" title="All 2 branches missed.">                    if (value instanceof Short) {</span>
+<span class="nc" id="L626">                        return (Short) value;</span>
+<span class="nc bnc" id="L627" title="All 2 branches missed.">                    } else if (value instanceof String) {</span>
+<span class="nc" id="L628">                        return Short.parseShort(trimmed);</span>
+                    } else {
+<span class="nc" id="L630">                        throw new ConfigException(name, value, &quot;Expected value to be an number.&quot;);</span>
+                    }
+                case LONG:
+<span class="fc bfc" id="L633" title="All 2 branches covered.">                    if (value instanceof Integer)</span>
+<span class="fc" id="L634">                        return ((Integer) value).longValue();</span>
+<span class="pc bpc" id="L635" title="1 of 2 branches missed.">                    if (value instanceof Long)</span>
+<span class="fc" id="L636">                        return (Long) value;</span>
+<span class="nc bnc" id="L637" title="All 2 branches missed.">                    else if (value instanceof String)</span>
+<span class="nc" id="L638">                        return Long.parseLong(trimmed);</span>
+                    else
+<span class="nc" id="L640">                        throw new ConfigException(name, value, &quot;Expected value to be an number.&quot;);</span>
+                case DOUBLE:
+<span class="pc bpc" id="L642" title="1 of 2 branches missed.">                    if (value instanceof Number)</span>
+<span class="fc" id="L643">                        return ((Number) value).doubleValue();</span>
+<span class="nc bnc" id="L644" title="All 2 branches missed.">                    else if (value instanceof String)</span>
+<span class="nc" id="L645">                        return Double.parseDouble(trimmed);</span>
+                    else
+<span class="nc" id="L647">                        throw new ConfigException(name, value, &quot;Expected value to be an number.&quot;);</span>
+                case LIST:
+<span class="pc bpc" id="L649" title="1 of 2 branches missed.">                    if (value instanceof List)</span>
+<span class="nc" id="L650">                        return (List&lt;?&gt;) value;</span>
+<span class="pc bpc" id="L651" title="1 of 2 branches missed.">                    else if (value instanceof String)</span>
+<span class="fc bfc" id="L652" title="All 2 branches covered.">                        if (trimmed.isEmpty())</span>
+<span class="fc" id="L653">                            return Collections.emptyList();</span>
+                        else
+<span class="fc" id="L655">                            return Arrays.asList(trimmed.split(&quot;\\s*,\\s*&quot;, -1));</span>
+                    else
+<span class="nc" id="L657">                        throw new ConfigException(name, value, &quot;Expected a comma separated list.&quot;);</span>
+                case CLASS:
+<span class="pc bpc" id="L659" title="1 of 2 branches missed.">                    if (value instanceof Class)</span>
+<span class="fc" id="L660">                        return (Class&lt;?&gt;) value;</span>
+<span class="nc bnc" id="L661" title="All 2 branches missed.">                    else if (value instanceof String)</span>
+<span class="nc" id="L662">                        return Class.forName(trimmed, true, Utils.getContextOrKafkaClassLoader());</span>
+                    else
+<span class="nc" id="L664">                        throw new ConfigException(name, value, &quot;Expected a Class instance or class name.&quot;);</span>
+                default:
+<span class="nc" id="L666">                    throw new IllegalStateException(&quot;Unknown type.&quot;);</span>
+            }
+<span class="nc" id="L668">        } catch (NumberFormatException e) {</span>
+<span class="nc" id="L669">            throw new ConfigException(name, value, &quot;Not a number of type &quot; + type);</span>
+<span class="nc" id="L670">        } catch (ClassNotFoundException e) {</span>
+<span class="nc" id="L671">            throw new ConfigException(name, value, &quot;Class &quot; + value + &quot; could not be found.&quot;);</span>
+        }
+    }
+
+    public static String convertToString(Object parsedValue, Type type) {
+<span class="nc bnc" id="L676" title="All 2 branches missed.">        if (parsedValue == null) {</span>
+<span class="nc" id="L677">            return null;</span>
+        }
+
+<span class="nc bnc" id="L680" title="All 2 branches missed.">        if (type == null) {</span>
+<span class="nc" id="L681">            return parsedValue.toString();</span>
+        }
+
+<span class="nc bnc" id="L684" title="All 4 branches missed.">        switch (type) {</span>
+            case BOOLEAN:
+            case SHORT:
+            case INT:
+            case LONG:
+            case DOUBLE:
+            case STRING:
+            case PASSWORD:
+<span class="nc" id="L692">                return parsedValue.toString();</span>
+            case LIST:
+<span class="nc" id="L694">                List&lt;?&gt; valueList = (List&lt;?&gt;) parsedValue;</span>
+<span class="nc" id="L695">                return Utils.join(valueList, &quot;,&quot;);</span>
+            case CLASS:
+<span class="nc" id="L697">                Class&lt;?&gt; clazz = (Class&lt;?&gt;) parsedValue;</span>
+<span class="nc" id="L698">                return clazz.getCanonicalName();</span>
+            default:
+<span class="nc" id="L700">                throw new IllegalStateException(&quot;Unknown type.&quot;);</span>
+        }
+    }
+
+    /**
+     * The config types
+     */
+<span class="pc" id="L707">    public enum Type {</span>
+<span class="fc" id="L708">        BOOLEAN, STRING, INT, SHORT, LONG, DOUBLE, LIST, CLASS, PASSWORD</span>
+    }
+
+    /**
+     * The importance level for a configuration
+     */
+<span class="pc" id="L714">    public enum Importance {</span>
+<span class="fc" id="L715">        HIGH, MEDIUM, LOW</span>
+    }
+
+    /**
+     * The width of a configuration value
+     */
+<span class="pc" id="L721">    public enum Width {</span>
+<span class="fc" id="L722">        NONE, SHORT, MEDIUM, LONG</span>
+    }
+
+    /**
+     * This is used by the {@link #validate(Map)} to get valid values for a configuration given the current
+     * configuration values in order to perform full configuration validation and visibility modification.
+     * In case that there are dependencies between configurations, the valid values and visibility
+     * for a configuration may change given the values of other configurations.
+     */
+    public interface Recommender {
+
+        /**
+         * The valid values for the configuration given the current configuration values.
+         * @param name The name of the configuration
+         * @param parsedConfig The parsed configuration values
+         * @return The list of valid values. To function properly, the returned objects should have the type
+         * defined for the configuration using the recommender.
+         */
+        List&lt;Object&gt; validValues(String name, Map&lt;String, Object&gt; parsedConfig);
+
+        /**
+         * Set the visibility of the configuration given the current configuration values.
+         * @param name The name of the configuration
+         * @param parsedConfig The parsed configuration values
+         * @return The visibility of the configuration
+         */
+        boolean visible(String name, Map&lt;String, Object&gt; parsedConfig);
+    }
+
+    /**
+     * Validation logic the user may provide to perform single configuration validation.
+     */
+    public interface Validator {
+        /**
+         * Perform single configuration validation.
+         * @param name The name of the configuration
+         * @param value The value of the configuration
+         */
+        void ensureValid(String name, Object value);
+    }
+
+    /**
+     * Validation logic for numeric ranges
+     */
+    public static class Range implements Validator {
+        private final Number min;
+        private final Number max;
+
+<span class="fc" id="L770">        private Range(Number min, Number max) {</span>
+<span class="fc" id="L771">            this.min = min;</span>
+<span class="fc" id="L772">            this.max = max;</span>
+<span class="fc" id="L773">        }</span>
+
+        /**
+         * A numeric range that checks only the lower bound
+         *
+         * @param min The minimum acceptable value
+         */
+        public static Range atLeast(Number min) {
+<span class="fc" id="L781">            return new Range(min, null);</span>
+        }
+
+        /**
+         * A numeric range that checks both the upper and lower bound
+         */
+        public static Range between(Number min, Number max) {
+<span class="fc" id="L788">            return new Range(min, max);</span>
+        }
+
+        public void ensureValid(String name, Object o) {
+<span class="pc bpc" id="L792" title="1 of 2 branches missed.">            if (o == null)</span>
+<span class="nc" id="L793">                throw new ConfigException(name, o, &quot;Value must be non-null&quot;);</span>
+<span class="fc" id="L794">            Number n = (Number) o;</span>
+<span class="pc bpc" id="L795" title="1 of 4 branches missed.">            if (min != null &amp;&amp; n.doubleValue() &lt; min.doubleValue())</span>
+<span class="fc" id="L796">                throw new ConfigException(name, o, &quot;Value must be at least &quot; + min);</span>
+<span class="pc bpc" id="L797" title="1 of 4 branches missed.">            if (max != null &amp;&amp; n.doubleValue() &gt; max.doubleValue())</span>
+<span class="nc" id="L798">                throw new ConfigException(name, o, &quot;Value must be no more than &quot; + max);</span>
+<span class="fc" id="L799">        }</span>
+
+        public String toString() {
+<span class="nc bnc" id="L802" title="All 2 branches missed.">            if (min == null)</span>
+<span class="nc" id="L803">                return &quot;[...,&quot; + max + &quot;]&quot;;</span>
+<span class="nc bnc" id="L804" title="All 2 branches missed.">            else if (max == null)</span>
+<span class="nc" id="L805">                return &quot;[&quot; + min + &quot;,...]&quot;;</span>
+            else
+<span class="nc" id="L807">                return &quot;[&quot; + min + &quot;,...,&quot; + max + &quot;]&quot;;</span>
+        }
+    }
+
+    public static class ValidList implements Validator {
+
+        ValidString validString;
+
+<span class="nc" id="L815">        private ValidList(List&lt;String&gt; validStrings) {</span>
+<span class="nc" id="L816">            this.validString = new ValidString(validStrings);</span>
+<span class="nc" id="L817">        }</span>
+
+        public static ValidList in(String... validStrings) {
+<span class="nc" id="L820">            return new ValidList(Arrays.asList(validStrings));</span>
+        }
+
+        @Override
+        public void ensureValid(final String name, final Object value) {
+<span class="nc" id="L825">            List&lt;String&gt; values = (List&lt;String&gt;) value;</span>
+<span class="nc bnc" id="L826" title="All 2 branches missed.">            for (String string : values) {</span>
+<span class="nc" id="L827">                validString.ensureValid(name, string);</span>
+<span class="nc" id="L828">            }</span>
+<span class="nc" id="L829">        }</span>
+
+        public String toString() {
+<span class="nc" id="L832">            return validString.toString();</span>
+        }
+    }
+
+    public static class ValidString implements Validator {
+        List&lt;String&gt; validStrings;
+
+<span class="fc" id="L839">        private ValidString(List&lt;String&gt; validStrings) {</span>
+<span class="fc" id="L840">            this.validStrings = validStrings;</span>
+<span class="fc" id="L841">        }</span>
+
+        public static ValidString in(String... validStrings) {
+<span class="fc" id="L844">            return new ValidString(Arrays.asList(validStrings));</span>
+        }
+
+        @Override
+        public void ensureValid(String name, Object o) {
+<span class="fc" id="L849">            String s = (String) o;</span>
+<span class="pc bpc" id="L850" title="1 of 2 branches missed.">            if (!validStrings.contains(s)) {</span>
+<span class="nc" id="L851">                throw new ConfigException(name, o, &quot;String must be one of: &quot; + Utils.join(validStrings, &quot;, &quot;));</span>
+            }
+
+<span class="fc" id="L854">        }</span>
+
+        public String toString() {
+<span class="nc" id="L857">            return &quot;[&quot; + Utils.join(validStrings, &quot;, &quot;) + &quot;]&quot;;</span>
+        }
+    }
+
+    public static class ConfigKey {
+        public final String name;
+        public final Type type;
+        public final String documentation;
+        public final Object defaultValue;
+        public final Validator validator;
+        public final Importance importance;
+        public final String group;
+        public final int orderInGroup;
+        public final Width width;
+        public final String displayName;
+        public final List&lt;String&gt; dependents;
+        public final Recommender recommender;
+
+        public ConfigKey(String name, Type type, Object defaultValue, Validator validator,
+                         Importance importance, String documentation, String group,
+                         int orderInGroup, Width width, String displayName,
+<span class="fc" id="L878">                         List&lt;String&gt; dependents, Recommender recommender) {</span>
+<span class="fc" id="L879">            this.name = name;</span>
+<span class="fc" id="L880">            this.type = type;</span>
+<span class="fc" id="L881">            this.defaultValue = defaultValue;</span>
+<span class="fc" id="L882">            this.validator = validator;</span>
+<span class="fc" id="L883">            this.importance = importance;</span>
+<span class="pc bpc" id="L884" title="1 of 4 branches missed.">            if (this.validator != null &amp;&amp; this.hasDefault())</span>
+<span class="fc" id="L885">                this.validator.ensureValid(name, defaultValue);</span>
+<span class="fc" id="L886">            this.documentation = documentation;</span>
+<span class="fc" id="L887">            this.dependents = dependents;</span>
+<span class="fc" id="L888">            this.group = group;</span>
+<span class="fc" id="L889">            this.orderInGroup = orderInGroup;</span>
+<span class="fc" id="L890">            this.width = width;</span>
+<span class="fc" id="L891">            this.displayName = displayName;</span>
+<span class="fc" id="L892">            this.recommender = recommender;</span>
+<span class="fc" id="L893">        }</span>
+
+        public boolean hasDefault() {
+<span class="pc bpc" id="L896" title="1 of 2 branches missed.">            return this.defaultValue != NO_DEFAULT_VALUE;</span>
+        }
+    }
+
+    protected List&lt;String&gt; headers() {
+<span class="nc" id="L901">        return Arrays.asList(&quot;Name&quot;, &quot;Description&quot;, &quot;Type&quot;, &quot;Default&quot;, &quot;Valid Values&quot;, &quot;Importance&quot;);</span>
+    }
+
+    protected String getConfigValue(ConfigKey key, String headerName) {
+<span class="nc bnc" id="L905" title="All 26 branches missed.">        switch (headerName) {</span>
+            case &quot;Name&quot;:
+<span class="nc" id="L907">                return key.name;</span>
+            case &quot;Description&quot;:
+<span class="nc" id="L909">                return key.documentation;</span>
+            case &quot;Type&quot;:
+<span class="nc" id="L911">                return key.type.toString().toLowerCase(Locale.ROOT);</span>
+            case &quot;Default&quot;:
+<span class="nc bnc" id="L913" title="All 2 branches missed.">                if (key.hasDefault()) {</span>
+<span class="nc bnc" id="L914" title="All 2 branches missed.">                    if (key.defaultValue == null)</span>
+<span class="nc" id="L915">                        return &quot;null&quot;;</span>
+<span class="nc bnc" id="L916" title="All 4 branches missed.">                    else if (key.type == Type.STRING &amp;&amp; key.defaultValue.toString().isEmpty())</span>
+<span class="nc" id="L917">                        return &quot;\&quot;\&quot;&quot;;</span>
+                    else
+<span class="nc" id="L919">                        return key.defaultValue.toString();</span>
+                } else
+<span class="nc" id="L921">                    return &quot;&quot;;</span>
+            case &quot;Valid Values&quot;:
+<span class="nc bnc" id="L923" title="All 2 branches missed.">                return key.validator != null ? key.validator.toString() : &quot;&quot;;</span>
+            case &quot;Importance&quot;:
+<span class="nc" id="L925">                return key.importance.toString().toLowerCase(Locale.ROOT);</span>
+            default:
+<span class="nc" id="L927">                throw new RuntimeException(&quot;Can't find value for header '&quot; + headerName + &quot;' in &quot; + key.name);</span>
+        }
+    }
+    
+    public String toHtmlTable() {
+<span class="nc" id="L932">        List&lt;ConfigKey&gt; configs = sortedConfigs();</span>
+<span class="nc" id="L933">        StringBuilder b = new StringBuilder();</span>
+<span class="nc" id="L934">        b.append(&quot;&lt;table class=\&quot;data-table\&quot;&gt;&lt;tbody&gt;\n&quot;);</span>
+<span class="nc" id="L935">        b.append(&quot;&lt;tr&gt;\n&quot;);</span>
+        // print column headers
+<span class="nc bnc" id="L937" title="All 2 branches missed.">        for (String headerName : headers()) {</span>
+<span class="nc" id="L938">            b.append(&quot;&lt;th&gt;&quot;);</span>
+<span class="nc" id="L939">            b.append(headerName);</span>
+<span class="nc" id="L940">            b.append(&quot;&lt;/th&gt;\n&quot;);</span>
+<span class="nc" id="L941">        }</span>
+<span class="nc" id="L942">        b.append(&quot;&lt;/tr&gt;\n&quot;);</span>
+<span class="nc bnc" id="L943" title="All 2 branches missed.">        for (ConfigKey def : configs) {</span>
+<span class="nc" id="L944">            b.append(&quot;&lt;tr&gt;\n&quot;);</span>
+            // print column values
+<span class="nc bnc" id="L946" title="All 2 branches missed.">            for (String headerName : headers()) {</span>
+<span class="nc" id="L947">                b.append(&quot;&lt;td&gt;&quot;);</span>
+<span class="nc" id="L948">                b.append(getConfigValue(def, headerName));</span>
+<span class="nc" id="L949">                b.append(&quot;&lt;/td&gt;&quot;);</span>
+<span class="nc" id="L950">            }</span>
+<span class="nc" id="L951">            b.append(&quot;&lt;/tr&gt;\n&quot;);</span>
+<span class="nc" id="L952">        }</span>
+<span class="nc" id="L953">        b.append(&quot;&lt;/tbody&gt;&lt;/table&gt;&quot;);</span>
+<span class="nc" id="L954">        return b.toString();</span>
+    }
+
+    /**
+     * Get the configs formatted with reStructuredText, suitable for embedding in Sphinx
+     * documentation.
+     */
+    public String toRst() {
+<span class="nc" id="L962">        List&lt;ConfigKey&gt; configs = sortedConfigs();</span>
+<span class="nc" id="L963">        StringBuilder b = new StringBuilder();</span>
+
+<span class="nc bnc" id="L965" title="All 2 branches missed.">        for (ConfigKey def : configs) {</span>
+<span class="nc" id="L966">            b.append(&quot;``&quot;);</span>
+<span class="nc" id="L967">            b.append(def.name);</span>
+<span class="nc" id="L968">            b.append(&quot;``\n&quot;);</span>
+<span class="nc bnc" id="L969" title="All 2 branches missed.">            for (String docLine : def.documentation.split(&quot;\n&quot;)) {</span>
+<span class="nc bnc" id="L970" title="All 2 branches missed.">                if (docLine.length() == 0) {</span>
+<span class="nc" id="L971">                    continue;</span>
+                }
+<span class="nc" id="L973">                b.append(&quot;  &quot;);</span>
+<span class="nc" id="L974">                b.append(docLine);</span>
+<span class="nc" id="L975">                b.append(&quot;\n\n&quot;);</span>
+            }
+<span class="nc" id="L977">            b.append(&quot;  * Type: &quot;);</span>
+<span class="nc" id="L978">            b.append(def.type.toString().toLowerCase(Locale.ROOT));</span>
+<span class="nc" id="L979">            b.append(&quot;\n&quot;);</span>
+<span class="nc bnc" id="L980" title="All 2 branches missed.">            if (def.defaultValue != null) {</span>
+<span class="nc" id="L981">                b.append(&quot;  * Default: &quot;);</span>
+<span class="nc bnc" id="L982" title="All 2 branches missed.">                if (def.type == Type.STRING) {</span>
+<span class="nc" id="L983">                    b.append(&quot;\&quot;&quot;);</span>
+<span class="nc" id="L984">                    b.append(def.defaultValue);</span>
+<span class="nc" id="L985">                    b.append(&quot;\&quot;&quot;);</span>
+                } else {
+<span class="nc" id="L987">                    b.append(def.defaultValue);</span>
+                }
+<span class="nc" id="L989">                b.append(&quot;\n&quot;);</span>
+            }
+<span class="nc" id="L991">            b.append(&quot;  * Importance: &quot;);</span>
+<span class="nc" id="L992">            b.append(def.importance.toString().toLowerCase(Locale.ROOT));</span>
+<span class="nc" id="L993">            b.append(&quot;\n\n&quot;);</span>
+<span class="nc" id="L994">        }</span>
+<span class="nc" id="L995">        return b.toString();</span>
+    }
+
+    /**
+     * Get a list of configs sorted into &quot;natural&quot; order: listing required fields first, then
+     * ordering by importance, and finally by name.
+     */
+    protected List&lt;ConfigKey&gt; sortedConfigs() {
+        // sort first required fields, then by importance, then name
+<span class="nc" id="L1004">        List&lt;ConfigKey&gt; configs = new ArrayList&lt;&gt;(this.configKeys.values());</span>
+<span class="nc" id="L1005">        Collections.sort(configs, new Comparator&lt;ConfigKey&gt;() {</span>
+            public int compare(ConfigKey k1, ConfigKey k2) {
+                // first take anything with no default value
+<span class="nc bnc" id="L1008" title="All 4 branches missed.">                if (!k1.hasDefault() &amp;&amp; k2.hasDefault()) {</span>
+<span class="nc" id="L1009">                    return -1;</span>
+<span class="nc bnc" id="L1010" title="All 4 branches missed.">                } else if (!k2.hasDefault() &amp;&amp; k1.hasDefault()) {</span>
+<span class="nc" id="L1011">                    return 1;</span>
+                }
+
+                // then sort by importance
+<span class="nc" id="L1015">                int cmp = k1.importance.compareTo(k2.importance);</span>
+<span class="nc bnc" id="L1016" title="All 2 branches missed.">                if (cmp == 0) {</span>
+                    // then sort in alphabetical order
+<span class="nc" id="L1018">                    return k1.name.compareTo(k2.name);</span>
+                } else {
+<span class="nc" id="L1020">                    return cmp;</span>
+                }
+            }
+        });
+<span class="nc" id="L1024">        return configs;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.6.201602180812</span></div></body></html>

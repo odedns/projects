@@ -1,0 +1,6 @@
+il\co\menora\soaarchive\entities\QMgrConnData.class
+il\co\menora\soaarchive\entities\Outgoing.class
+il\co\menora\soaarchive\ejb\IncomingDao.class
+il\co\menora\soaarchive\entities\Incoming.class
+il\co\menora\soaarchive\ejb\GeneralBean.class
+il\co\menora\soaarchive\entities\Payload.class

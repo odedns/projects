@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="test.io.iguaz.v3io.kafka.SendHandlerTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2016-12-28T19:46:30" hostname="oded-Latitude-3440" time="0.004">
+  <properties/>
+  <testcase name="testOnError" classname="test.io.iguaz.v3io.kafka.SendHandlerTest" time="0.002"/>
+  <testcase name="testOnSuccess" classname="test.io.iguaz.v3io.kafka.SendHandlerTest" time="0.001"/>
+  <system-out><![CDATA[testOnError
+TestInterceptor.onAcknowledgement()
+OnCompletion: /test-0@0
+got Exception: Some error
+testOnSuccess
+TestInterceptor.onAcknowledgement()
+OnCompletion: /test-0@0
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

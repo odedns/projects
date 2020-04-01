@@ -1,0 +1,17 @@
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/mnr_repos/ESB/!svn/ver/384/SoaArchiveEjb/src/main/resources/META-INF
+END
+ejb-jar.xml
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/mnr_repos/ESB/!svn/ver/384/SoaArchiveEjb/src/main/resources/META-INF/ejb-jar.xml
+END
+persistence.xml
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/mnr_repos/ESB/!svn/ver/384/SoaArchiveEjb/src/main/resources/META-INF/persistence.xml
+END

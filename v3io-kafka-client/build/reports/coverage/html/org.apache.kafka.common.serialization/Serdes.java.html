@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>Serdes.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">v3io-kafka-client</a> &gt; <a href="index.source.html" class="el_package">org.apache.kafka.common.serialization</a> &gt; <span class="el_source">Serdes.java</span></div><h1>Serdes.java</h1><pre class="source lang-java linenums">/**
+ * Licensed to the Apache Software Foundation (ASF) under one or more contributor license agreements. See the NOTICE
+ * file distributed with this work for additional information regarding copyright ownership. The ASF licenses this file
+ * to You under the Apache License, Version 2.0 (the &quot;License&quot;); you may not use this file except in compliance with the
+ * License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+ * an &quot;AS IS&quot; BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
+ */
+
+package org.apache.kafka.common.serialization;
+
+import org.apache.kafka.common.utils.Bytes;
+
+import java.nio.ByteBuffer;
+import java.util.Map;
+
+/**
+ * Factory for creating serializers / deserializers.
+ */
+<span class="nc" id="L24">public class Serdes {</span>
+
+    static protected class WrapperSerde&lt;T&gt; implements Serde&lt;T&gt; {
+        final private Serializer&lt;T&gt; serializer;
+        final private Deserializer&lt;T&gt; deserializer;
+
+<span class="nc" id="L30">        public WrapperSerde(Serializer&lt;T&gt; serializer, Deserializer&lt;T&gt; deserializer) {</span>
+<span class="nc" id="L31">            this.serializer = serializer;</span>
+<span class="nc" id="L32">            this.deserializer = deserializer;</span>
+<span class="nc" id="L33">        }</span>
+
+        @Override
+        public void configure(Map&lt;String, ?&gt; configs, boolean isKey) {
+<span class="nc" id="L37">            serializer.configure(configs, isKey);</span>
+<span class="nc" id="L38">            deserializer.configure(configs, isKey);</span>
+<span class="nc" id="L39">        }</span>
+
+        @Override
+        public void close() {
+<span class="nc" id="L43">            serializer.close();</span>
+<span class="nc" id="L44">            deserializer.close();</span>
+<span class="nc" id="L45">        }</span>
+
+        @Override
+        public Serializer&lt;T&gt; serializer() {
+<span class="nc" id="L49">            return serializer;</span>
+        }
+
+        @Override
+        public Deserializer&lt;T&gt; deserializer() {
+<span class="nc" id="L54">            return deserializer;</span>
+        }
+    }
+
+    static public final class LongSerde extends WrapperSerde&lt;Long&gt; {
+        public LongSerde() {
+<span class="nc" id="L60">            super(new LongSerializer(), new LongDeserializer());</span>
+<span class="nc" id="L61">        }</span>
+    }
+
+    static public final class IntegerSerde extends WrapperSerde&lt;Integer&gt; {
+        public IntegerSerde() {
+<span class="nc" id="L66">            super(new IntegerSerializer(), new IntegerDeserializer());</span>
+<span class="nc" id="L67">        }</span>
+    }
+
+    static public final class DoubleSerde extends WrapperSerde&lt;Double&gt; {
+        public DoubleSerde() {
+<span class="nc" id="L72">            super(new DoubleSerializer(), new DoubleDeserializer());</span>
+<span class="nc" id="L73">        }</span>
+    }
+
+    static public final class StringSerde extends WrapperSerde&lt;String&gt; {
+        public StringSerde() {
+<span class="nc" id="L78">            super(new StringSerializer(), new StringDeserializer());</span>
+<span class="nc" id="L79">        }</span>
+    }
+
+    static public final class ByteBufferSerde extends WrapperSerde&lt;ByteBuffer&gt; {
+        public ByteBufferSerde() {
+<span class="nc" id="L84">            super(new ByteBufferSerializer(), new ByteBufferDeserializer());</span>
+<span class="nc" id="L85">        }</span>
+    }
+
+    static public final class BytesSerde extends WrapperSerde&lt;Bytes&gt; {
+        public BytesSerde() {
+<span class="nc" id="L90">            super(new BytesSerializer(), new BytesDeserializer());</span>
+<span class="nc" id="L91">        }</span>
+    }
+
+    static public final class ByteArraySerde extends WrapperSerde&lt;byte[]&gt; {
+        public ByteArraySerde() {
+<span class="nc" id="L96">            super(new ByteArraySerializer(), new ByteArrayDeserializer());</span>
+<span class="nc" id="L97">        }</span>
+    }
+
+    @SuppressWarnings(&quot;unchecked&quot;)
+    static public &lt;T&gt; Serde&lt;T&gt; serdeFrom(Class&lt;T&gt; type) {
+<span class="nc bnc" id="L102" title="All 2 branches missed.">        if (String.class.isAssignableFrom(type)) {</span>
+<span class="nc" id="L103">            return (Serde&lt;T&gt;) String();</span>
+        }
+
+<span class="nc bnc" id="L106" title="All 2 branches missed.">        if (Integer.class.isAssignableFrom(type)) {</span>
+<span class="nc" id="L107">            return (Serde&lt;T&gt;) Integer();</span>
+        }
+
+<span class="nc bnc" id="L110" title="All 2 branches missed.">        if (Long.class.isAssignableFrom(type)) {</span>
+<span class="nc" id="L111">            return (Serde&lt;T&gt;) Long();</span>
+        }
+
+<span class="nc bnc" id="L114" title="All 2 branches missed.">        if (Double.class.isAssignableFrom(type)) {</span>
+<span class="nc" id="L115">            return (Serde&lt;T&gt;) Double();</span>
+        }
+
+<span class="nc bnc" id="L118" title="All 2 branches missed.">        if (byte[].class.isAssignableFrom(type)) {</span>
+<span class="nc" id="L119">            return (Serde&lt;T&gt;) ByteArray();</span>
+        }
+
+<span class="nc bnc" id="L122" title="All 2 branches missed.">        if (ByteBuffer.class.isAssignableFrom(type)) {</span>
+<span class="nc" id="L123">            return (Serde&lt;T&gt;) ByteBuffer();</span>
+        }
+
+<span class="nc bnc" id="L126" title="All 2 branches missed.">        if (Bytes.class.isAssignableFrom(type)) {</span>
+<span class="nc" id="L127">            return (Serde&lt;T&gt;) Bytes();</span>
+        }
+
+        // TODO: we can also serializes objects of type T using generic Java serialization by default
+<span class="nc" id="L131">        throw new IllegalArgumentException(&quot;Unknown class for built-in serializer&quot;);</span>
+    }
+
+    /**
+     * Construct a serde object from separate serializer and deserializer
+     *
+     * @param serializer    must not be null.
+     * @param deserializer  must not be null.
+     */
+    static public &lt;T&gt; Serde&lt;T&gt; serdeFrom(final Serializer&lt;T&gt; serializer, final Deserializer&lt;T&gt; deserializer) {
+<span class="nc bnc" id="L141" title="All 2 branches missed.">        if (serializer == null) {</span>
+<span class="nc" id="L142">            throw new IllegalArgumentException(&quot;serializer must not be null&quot;);</span>
+        }
+<span class="nc bnc" id="L144" title="All 2 branches missed.">        if (deserializer == null) {</span>
+<span class="nc" id="L145">            throw new IllegalArgumentException(&quot;deserializer must not be null&quot;);</span>
+        }
+
+<span class="nc" id="L148">        return new WrapperSerde&lt;&gt;(serializer, deserializer);</span>
+    }
+
+    /*
+     * A serde for nullable {@code Long} type.
+     */
+    static public Serde&lt;Long&gt; Long() {
+<span class="nc" id="L155">        return new LongSerde();</span>
+    }
+
+    /*
+     * A serde for nullable {@code Integer} type.
+     */
+    static public Serde&lt;Integer&gt; Integer() {
+<span class="nc" id="L162">        return new IntegerSerde();</span>
+    }
+
+    /*
+     * A serde for nullable {@code Double} type.
+     */
+    static public Serde&lt;Double&gt; Double() {
+<span class="nc" id="L169">        return new DoubleSerde();</span>
+    }
+
+    /*
+     * A serde for nullable {@code String} type.
+     */
+    static public Serde&lt;String&gt; String() {
+<span class="nc" id="L176">        return new StringSerde();</span>
+    }
+
+    /*
+     * A serde for nullable {@code ByteBuffer} type.
+     */
+    static public Serde&lt;ByteBuffer&gt; ByteBuffer() {
+<span class="nc" id="L183">        return new ByteBufferSerde();</span>
+    }
+
+    /*
+     * A serde for nullable {@code Bytes} type.
+     */
+    static public Serde&lt;Bytes&gt; Bytes() {
+<span class="nc" id="L190">        return new BytesSerde();</span>
+    }
+
+    /*
+     * A serde for nullable {@code byte[]} type.
+     */
+    static public Serde&lt;byte[]&gt; ByteArray() {
+<span class="nc" id="L197">        return new ByteArraySerde();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.6.201602180812</span></div></body></html>

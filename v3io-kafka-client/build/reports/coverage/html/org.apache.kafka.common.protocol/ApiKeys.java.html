@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>ApiKeys.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">v3io-kafka-client</a> &gt; <a href="index.source.html" class="el_package">org.apache.kafka.common.protocol</a> &gt; <span class="el_source">ApiKeys.java</span></div><h1>ApiKeys.java</h1><pre class="source lang-java linenums">/**
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the &quot;License&quot;); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.apache.kafka.common.protocol;
+
+/**
+ * Identifiers for all the Kafka APIs
+ */
+<span class="nc" id="L22">public enum ApiKeys {</span>
+<span class="nc" id="L23">    PRODUCE(0, &quot;Produce&quot;),</span>
+<span class="nc" id="L24">    FETCH(1, &quot;Fetch&quot;),</span>
+<span class="nc" id="L25">    LIST_OFFSETS(2, &quot;Offsets&quot;),</span>
+<span class="nc" id="L26">    METADATA(3, &quot;Metadata&quot;),</span>
+<span class="nc" id="L27">    LEADER_AND_ISR(4, &quot;LeaderAndIsr&quot;),</span>
+<span class="nc" id="L28">    STOP_REPLICA(5, &quot;StopReplica&quot;),</span>
+<span class="nc" id="L29">    UPDATE_METADATA_KEY(6, &quot;UpdateMetadata&quot;),</span>
+<span class="nc" id="L30">    CONTROLLED_SHUTDOWN_KEY(7, &quot;ControlledShutdown&quot;),</span>
+<span class="nc" id="L31">    OFFSET_COMMIT(8, &quot;OffsetCommit&quot;),</span>
+<span class="nc" id="L32">    OFFSET_FETCH(9, &quot;OffsetFetch&quot;),</span>
+<span class="nc" id="L33">    GROUP_COORDINATOR(10, &quot;GroupCoordinator&quot;),</span>
+<span class="nc" id="L34">    JOIN_GROUP(11, &quot;JoinGroup&quot;),</span>
+<span class="nc" id="L35">    HEARTBEAT(12, &quot;Heartbeat&quot;),</span>
+<span class="nc" id="L36">    LEAVE_GROUP(13, &quot;LeaveGroup&quot;),</span>
+<span class="nc" id="L37">    SYNC_GROUP(14, &quot;SyncGroup&quot;),</span>
+<span class="nc" id="L38">    DESCRIBE_GROUPS(15, &quot;DescribeGroups&quot;),</span>
+<span class="nc" id="L39">    LIST_GROUPS(16, &quot;ListGroups&quot;),</span>
+<span class="nc" id="L40">    SASL_HANDSHAKE(17, &quot;SaslHandshake&quot;),</span>
+<span class="nc" id="L41">    API_VERSIONS(18, &quot;ApiVersions&quot;),</span>
+<span class="nc" id="L42">    CREATE_TOPICS(19, &quot;CreateTopics&quot;),</span>
+<span class="nc" id="L43">    DELETE_TOPICS(20, &quot;DeleteTopics&quot;);</span>
+
+    private static final ApiKeys[] ID_TO_TYPE;
+    private static final int MIN_API_KEY = 0;
+    public static final int MAX_API_KEY;
+
+    static {
+<span class="nc" id="L50">        int maxKey = -1;</span>
+<span class="nc bnc" id="L51" title="All 2 branches missed.">        for (ApiKeys key : ApiKeys.values())</span>
+<span class="nc" id="L52">            maxKey = Math.max(maxKey, key.id);</span>
+<span class="nc" id="L53">        ApiKeys[] idToType = new ApiKeys[maxKey + 1];</span>
+<span class="nc bnc" id="L54" title="All 2 branches missed.">        for (ApiKeys key : ApiKeys.values())</span>
+<span class="nc" id="L55">            idToType[key.id] = key;</span>
+<span class="nc" id="L56">        ID_TO_TYPE = idToType;</span>
+<span class="nc" id="L57">        MAX_API_KEY = maxKey;</span>
+<span class="nc" id="L58">    }</span>
+
+    /** the permanent and immutable id of an API--this can't change ever */
+    public final short id;
+
+    /** an english description of the api--this is for debugging and can change */
+    public final String name;
+
+<span class="nc" id="L66">    private ApiKeys(int id, String name) {</span>
+<span class="nc" id="L67">        this.id = (short) id;</span>
+<span class="nc" id="L68">        this.name = name;</span>
+<span class="nc" id="L69">    }</span>
+
+    public static ApiKeys forId(int id) {
+<span class="nc bnc" id="L72" title="All 4 branches missed.">        if (id &lt; MIN_API_KEY || id &gt; MAX_API_KEY)</span>
+<span class="nc" id="L73">            throw new IllegalArgumentException(String.format(&quot;Unexpected ApiKeys id `%s`, it should be between `%s` &quot; +</span>
+<span class="nc" id="L74">                    &quot;and `%s` (inclusive)&quot;, id, MIN_API_KEY, MAX_API_KEY));</span>
+<span class="nc" id="L75">        return ID_TO_TYPE[id];</span>
+    }
+
+    private static String toHtml() {
+<span class="nc" id="L79">        final StringBuilder b = new StringBuilder();</span>
+<span class="nc" id="L80">        b.append(&quot;&lt;table class=\&quot;data-table\&quot;&gt;&lt;tbody&gt;\n&quot;);</span>
+<span class="nc" id="L81">        b.append(&quot;&lt;tr&gt;&quot;);</span>
+<span class="nc" id="L82">        b.append(&quot;&lt;th&gt;Name&lt;/th&gt;\n&quot;);</span>
+<span class="nc" id="L83">        b.append(&quot;&lt;th&gt;Key&lt;/th&gt;\n&quot;);</span>
+<span class="nc" id="L84">        b.append(&quot;&lt;/tr&gt;&quot;);</span>
+<span class="nc bnc" id="L85" title="All 2 branches missed.">        for (ApiKeys key : ApiKeys.values()) {</span>
+<span class="nc" id="L86">            b.append(&quot;&lt;tr&gt;\n&quot;);</span>
+<span class="nc" id="L87">            b.append(&quot;&lt;td&gt;&quot;);</span>
+<span class="nc" id="L88">            b.append(key.name);</span>
+<span class="nc" id="L89">            b.append(&quot;&lt;/td&gt;&quot;);</span>
+<span class="nc" id="L90">            b.append(&quot;&lt;td&gt;&quot;);</span>
+<span class="nc" id="L91">            b.append(key.id);</span>
+<span class="nc" id="L92">            b.append(&quot;&lt;/td&gt;&quot;);</span>
+<span class="nc" id="L93">            b.append(&quot;&lt;/tr&gt;\n&quot;);</span>
+        }
+<span class="nc" id="L95">        b.append(&quot;&lt;/table&gt;\n&quot;);</span>
+<span class="nc" id="L96">        return b.toString();</span>
+    }
+
+    public static void main(String[] args) {
+<span class="nc" id="L100">        System.out.println(toHtml());</span>
+<span class="nc" id="L101">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.6.201602180812</span></div></body></html>

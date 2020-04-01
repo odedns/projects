@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>SendHandler.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">v3io-kafka-client</a> &gt; <a href="index.source.html" class="el_package">io.iguaz.v3io.kafka</a> &gt; <span class="el_source">SendHandler.java</span></div><h1>SendHandler.java</h1><pre class="source lang-java linenums">package io.iguaz.v3io.kafka;
+
+import io.iguaz.v3io.daemon.client.api.consts.V3ioResultCode;
+import org.apache.kafka.clients.producer.Callback;
+import org.apache.kafka.clients.producer.RecordMetadata;
+import org.apache.kafka.clients.producer.internals.ProduceRequestResult;
+import org.apache.kafka.clients.producer.internals.ProducerInterceptors;
+import org.apache.kafka.common.KafkaException;
+import org.apache.kafka.common.TopicPartition;
+
+/**
+ * Created by oded on 21/12/16.
+ */
+public class SendHandler {
+
+    private Callback callback;
+    private ProducerInterceptors&lt;?,?&gt; interceptors;
+
+    public SendHandler(ProducerInterceptors&lt;?,?&gt; interceptors, Callback callback)
+<span class="nc" id="L20">    {</span>
+<span class="nc" id="L21">        this.callback = callback;</span>
+<span class="nc" id="L22">        this.interceptors = interceptors;</span>
+<span class="nc" id="L23">    }</span>
+
+    public SendHandler()
+<span class="fc" id="L26">    {</span>
+
+<span class="fc" id="L28">    }</span>
+
+    public void onSuccess(TopicPartition topicPartition, RecordMetadata recordMetadata, ProduceRequestResult res,long sequenceId)
+    {
+<span class="pc bpc" id="L32" title="1 of 2 branches missed.">        if(interceptors != null) {</span>
+<span class="fc" id="L33">            interceptors.onAcknowledgement( recordMetadata,null);</span>
+        }
+<span class="pc bpc" id="L35" title="1 of 2 branches missed.">        if(callback != null) {</span>
+<span class="fc" id="L36">            callback.onCompletion(recordMetadata, null);</span>
+        }
+<span class="fc" id="L38">        res.done(topicPartition, sequenceId, null);</span>
+
+<span class="fc" id="L40">    }</span>
+
+    public void onError(TopicPartition topicPartition, RecordMetadata recordMetadata, ProduceRequestResult res,KafkaException exception)
+    {
+
+<span class="pc bpc" id="L45" title="1 of 2 branches missed.">        if(interceptors != null) {</span>
+<span class="fc" id="L46">            interceptors.onSendError(null,topicPartition,exception);</span>
+        }
+<span class="pc bpc" id="L48" title="1 of 2 branches missed.">        if(callback != null) {</span>
+<span class="fc" id="L49">            callback.onCompletion(recordMetadata, exception);</span>
+        }
+<span class="fc" id="L51">        res.error();</span>
+
+
+<span class="fc" id="L54">    }</span>
+
+    public Callback getCallback() {
+<span class="nc" id="L57">        return callback;</span>
+    }
+
+    public void setCallback(Callback callback) {
+<span class="fc" id="L61">        this.callback = callback;</span>
+<span class="fc" id="L62">    }</span>
+
+    public ProducerInterceptors&lt;?, ?&gt; getInterceptors() {
+<span class="nc" id="L65">        return interceptors;</span>
+    }
+
+    public void setInterceptors(ProducerInterceptors&lt;?, ?&gt; interceptors) {
+<span class="fc" id="L69">        this.interceptors = interceptors;</span>
+<span class="fc" id="L70">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.6.201602180812</span></div></body></html>

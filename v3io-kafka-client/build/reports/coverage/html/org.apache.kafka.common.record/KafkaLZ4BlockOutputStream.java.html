@@ -1,0 +1,412 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>KafkaLZ4BlockOutputStream.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">v3io-kafka-client</a> &gt; <a href="index.source.html" class="el_package">org.apache.kafka.common.record</a> &gt; <span class="el_source">KafkaLZ4BlockOutputStream.java</span></div><h1>KafkaLZ4BlockOutputStream.java</h1><pre class="source lang-java linenums">/**
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the &quot;License&quot;); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.apache.kafka.common.record;
+
+import java.io.FilterOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+
+import org.apache.kafka.common.utils.Utils;
+
+import net.jpountz.lz4.LZ4Compressor;
+import net.jpountz.lz4.LZ4Factory;
+import net.jpountz.xxhash.XXHash32;
+import net.jpountz.xxhash.XXHashFactory;
+
+/**
+ * A partial implementation of the v1.5.1 LZ4 Frame format.
+ *
+ * @see &lt;a href=&quot;http://cyan4973.github.io/lz4/lz4_Frame_format.html&quot;&gt;LZ4 Frame Format&lt;/a&gt;
+ */
+public final class KafkaLZ4BlockOutputStream extends FilterOutputStream {
+
+    public static final int MAGIC = 0x184D2204;
+    public static final int LZ4_MAX_HEADER_LENGTH = 19;
+    public static final int LZ4_FRAME_INCOMPRESSIBLE_MASK = 0x80000000;
+
+    public static final String CLOSED_STREAM = &quot;The stream is already closed&quot;;
+
+    public static final int BLOCKSIZE_64KB = 4;
+    public static final int BLOCKSIZE_256KB = 5;
+    public static final int BLOCKSIZE_1MB = 6;
+    public static final int BLOCKSIZE_4MB = 7;
+
+    private final LZ4Compressor compressor;
+    private final XXHash32 checksum;
+    private final boolean useBrokenFlagDescriptorChecksum;
+    private final FLG flg;
+    private final BD bd;
+    private final byte[] buffer;
+    private final byte[] compressedBuffer;
+    private final int maxBlockSize;
+    private int bufferOffset;
+    private boolean finished;
+
+    /**
+     * Create a new {@link OutputStream} that will compress data using the LZ4 algorithm.
+     *
+     * @param out The output stream to compress
+     * @param blockSize Default: 4. The block size used during compression. 4=64kb, 5=256kb, 6=1mb, 7=4mb. All other
+     *            values will generate an exception
+     * @param blockChecksum Default: false. When true, a XXHash32 checksum is computed and appended to the stream for
+     *            every block of data
+     * @param useBrokenFlagDescriptorChecksum Default: false. When true, writes an incorrect FrameDescriptor checksum
+     *            compatible with older kafka clients.
+     * @throws IOException
+     */
+    public KafkaLZ4BlockOutputStream(OutputStream out, int blockSize, boolean blockChecksum, boolean useBrokenFlagDescriptorChecksum) throws IOException {
+<span class="nc" id="L73">        super(out);</span>
+<span class="nc" id="L74">        compressor = LZ4Factory.fastestInstance().fastCompressor();</span>
+<span class="nc" id="L75">        checksum = XXHashFactory.fastestInstance().hash32();</span>
+<span class="nc" id="L76">        this.useBrokenFlagDescriptorChecksum = useBrokenFlagDescriptorChecksum;</span>
+<span class="nc" id="L77">        bd = new BD(blockSize);</span>
+<span class="nc" id="L78">        flg = new FLG(blockChecksum);</span>
+<span class="nc" id="L79">        bufferOffset = 0;</span>
+<span class="nc" id="L80">        maxBlockSize = bd.getBlockMaximumSize();</span>
+<span class="nc" id="L81">        buffer = new byte[maxBlockSize];</span>
+<span class="nc" id="L82">        compressedBuffer = new byte[compressor.maxCompressedLength(maxBlockSize)];</span>
+<span class="nc" id="L83">        finished = false;</span>
+<span class="nc" id="L84">        writeHeader();</span>
+<span class="nc" id="L85">    }</span>
+
+    /**
+     * Create a new {@link OutputStream} that will compress data using the LZ4 algorithm.
+     *
+     * @param out The output stream to compress
+     * @param blockSize Default: 4. The block size used during compression. 4=64kb, 5=256kb, 6=1mb, 7=4mb. All other
+     *            values will generate an exception
+     * @param blockChecksum Default: false. When true, a XXHash32 checksum is computed and appended to the stream for
+     *            every block of data
+     * @throws IOException
+     */
+    public KafkaLZ4BlockOutputStream(OutputStream out, int blockSize, boolean blockChecksum) throws IOException {
+<span class="nc" id="L98">        this(out, blockSize, blockChecksum, false);</span>
+<span class="nc" id="L99">    }</span>
+
+    /**
+     * Create a new {@link OutputStream} that will compress data using the LZ4 algorithm.
+     *
+     * @param out The stream to compress
+     * @param blockSize Default: 4. The block size used during compression. 4=64kb, 5=256kb, 6=1mb, 7=4mb. All other
+     *            values will generate an exception
+     * @throws IOException
+     */
+    public KafkaLZ4BlockOutputStream(OutputStream out, int blockSize) throws IOException {
+<span class="nc" id="L110">        this(out, blockSize, false, false);</span>
+<span class="nc" id="L111">    }</span>
+
+    /**
+     * Create a new {@link OutputStream} that will compress data using the LZ4 algorithm.
+     *
+     * @param out The output stream to compress
+     * @throws IOException
+     */
+    public KafkaLZ4BlockOutputStream(OutputStream out) throws IOException {
+<span class="nc" id="L120">        this(out, BLOCKSIZE_64KB);</span>
+<span class="nc" id="L121">    }</span>
+
+    public KafkaLZ4BlockOutputStream(OutputStream out, boolean useBrokenHC) throws IOException {
+<span class="nc" id="L124">        this(out, BLOCKSIZE_64KB, false, useBrokenHC);</span>
+<span class="nc" id="L125">    }</span>
+
+    /**
+     * Check whether KafkaLZ4BlockInputStream is configured to write an
+     * incorrect Frame Descriptor checksum, which is useful for
+     * compatibility with old client implementations.
+     */
+    public boolean useBrokenFlagDescriptorChecksum() {
+<span class="nc" id="L133">        return this.useBrokenFlagDescriptorChecksum;</span>
+    }
+
+    /**
+     * Writes the magic number and frame descriptor to the underlying {@link OutputStream}.
+     *
+     * @throws IOException
+     */
+    private void writeHeader() throws IOException {
+<span class="nc" id="L142">        Utils.writeUnsignedIntLE(buffer, 0, MAGIC);</span>
+<span class="nc" id="L143">        bufferOffset = 4;</span>
+<span class="nc" id="L144">        buffer[bufferOffset++] = flg.toByte();</span>
+<span class="nc" id="L145">        buffer[bufferOffset++] = bd.toByte();</span>
+        // TODO write uncompressed content size, update flg.validate()
+
+        // compute checksum on all descriptor fields
+<span class="nc" id="L149">        int offset = 4;</span>
+<span class="nc" id="L150">        int len = bufferOffset - offset;</span>
+<span class="nc bnc" id="L151" title="All 2 branches missed.">        if (this.useBrokenFlagDescriptorChecksum) {</span>
+<span class="nc" id="L152">            len += offset;</span>
+<span class="nc" id="L153">            offset = 0;</span>
+        }
+<span class="nc" id="L155">        byte hash = (byte) ((checksum.hash(buffer, offset, len, 0) &gt;&gt; 8) &amp; 0xFF);</span>
+<span class="nc" id="L156">        buffer[bufferOffset++] = hash;</span>
+
+        // write out frame descriptor
+<span class="nc" id="L159">        out.write(buffer, 0, bufferOffset);</span>
+<span class="nc" id="L160">        bufferOffset = 0;</span>
+<span class="nc" id="L161">    }</span>
+
+    /**
+     * Compresses buffered data, optionally computes an XXHash32 checksum, and writes the result to the underlying
+     * {@link OutputStream}.
+     *
+     * @throws IOException
+     */
+    private void writeBlock() throws IOException {
+<span class="nc bnc" id="L170" title="All 2 branches missed.">        if (bufferOffset == 0) {</span>
+<span class="nc" id="L171">            return;</span>
+        }
+
+<span class="nc" id="L174">        int compressedLength = compressor.compress(buffer, 0, bufferOffset, compressedBuffer, 0);</span>
+<span class="nc" id="L175">        byte[] bufferToWrite = compressedBuffer;</span>
+<span class="nc" id="L176">        int compressMethod = 0;</span>
+
+        // Store block uncompressed if compressed length is greater (incompressible)
+<span class="nc bnc" id="L179" title="All 2 branches missed.">        if (compressedLength &gt;= bufferOffset) {</span>
+<span class="nc" id="L180">            bufferToWrite = buffer;</span>
+<span class="nc" id="L181">            compressedLength = bufferOffset;</span>
+<span class="nc" id="L182">            compressMethod = LZ4_FRAME_INCOMPRESSIBLE_MASK;</span>
+        }
+
+        // Write content
+<span class="nc" id="L186">        Utils.writeUnsignedIntLE(out, compressedLength | compressMethod);</span>
+<span class="nc" id="L187">        out.write(bufferToWrite, 0, compressedLength);</span>
+
+        // Calculate and write block checksum
+<span class="nc bnc" id="L190" title="All 2 branches missed.">        if (flg.isBlockChecksumSet()) {</span>
+<span class="nc" id="L191">            int hash = checksum.hash(bufferToWrite, 0, compressedLength, 0);</span>
+<span class="nc" id="L192">            Utils.writeUnsignedIntLE(out, hash);</span>
+        }
+<span class="nc" id="L194">        bufferOffset = 0;</span>
+<span class="nc" id="L195">    }</span>
+
+    /**
+     * Similar to the {@link #writeBlock()} method. Writes a 0-length block (without block checksum) to signal the end
+     * of the block stream.
+     *
+     * @throws IOException
+     */
+    private void writeEndMark() throws IOException {
+<span class="nc" id="L204">        Utils.writeUnsignedIntLE(out, 0);</span>
+        // TODO implement content checksum, update flg.validate()
+<span class="nc" id="L206">        finished = true;</span>
+<span class="nc" id="L207">    }</span>
+
+    @Override
+    public void write(int b) throws IOException {
+<span class="nc" id="L211">        ensureNotFinished();</span>
+<span class="nc bnc" id="L212" title="All 2 branches missed.">        if (bufferOffset == maxBlockSize) {</span>
+<span class="nc" id="L213">            writeBlock();</span>
+        }
+<span class="nc" id="L215">        buffer[bufferOffset++] = (byte) b;</span>
+<span class="nc" id="L216">    }</span>
+
+    @Override
+    public void write(byte[] b, int off, int len) throws IOException {
+<span class="nc" id="L220">        net.jpountz.util.SafeUtils.checkRange(b, off, len);</span>
+<span class="nc" id="L221">        ensureNotFinished();</span>
+
+<span class="nc" id="L223">        int bufferRemainingLength = maxBlockSize - bufferOffset;</span>
+        // while b will fill the buffer
+<span class="nc bnc" id="L225" title="All 2 branches missed.">        while (len &gt; bufferRemainingLength) {</span>
+            // fill remaining space in buffer
+<span class="nc" id="L227">            System.arraycopy(b, off, buffer, bufferOffset, bufferRemainingLength);</span>
+<span class="nc" id="L228">            bufferOffset = maxBlockSize;</span>
+<span class="nc" id="L229">            writeBlock();</span>
+            // compute new offset and length
+<span class="nc" id="L231">            off += bufferRemainingLength;</span>
+<span class="nc" id="L232">            len -= bufferRemainingLength;</span>
+<span class="nc" id="L233">            bufferRemainingLength = maxBlockSize;</span>
+        }
+
+<span class="nc" id="L236">        System.arraycopy(b, off, buffer, bufferOffset, len);</span>
+<span class="nc" id="L237">        bufferOffset += len;</span>
+<span class="nc" id="L238">    }</span>
+
+    @Override
+    public void flush() throws IOException {
+<span class="nc bnc" id="L242" title="All 2 branches missed.">        if (!finished) {</span>
+<span class="nc" id="L243">            writeBlock();</span>
+        }
+<span class="nc bnc" id="L245" title="All 2 branches missed.">        if (out != null) {</span>
+<span class="nc" id="L246">            out.flush();</span>
+        }
+<span class="nc" id="L248">    }</span>
+
+    /**
+     * A simple state check to ensure the stream is still open.
+     */
+    private void ensureNotFinished() {
+<span class="nc bnc" id="L254" title="All 2 branches missed.">        if (finished) {</span>
+<span class="nc" id="L255">            throw new IllegalStateException(CLOSED_STREAM);</span>
+        }
+<span class="nc" id="L257">    }</span>
+
+    @Override
+    public void close() throws IOException {
+<span class="nc bnc" id="L261" title="All 2 branches missed.">        if (!finished) {</span>
+<span class="nc" id="L262">            writeEndMark();</span>
+<span class="nc" id="L263">            flush();</span>
+<span class="nc" id="L264">            finished = true;</span>
+        }
+<span class="nc bnc" id="L266" title="All 2 branches missed.">        if (out != null) {</span>
+<span class="nc" id="L267">            out.close();</span>
+<span class="nc" id="L268">            out = null;</span>
+        }
+<span class="nc" id="L270">    }</span>
+
+    public static class FLG {
+
+        private static final int VERSION = 1;
+
+        private final int reserved;
+        private final int contentChecksum;
+        private final int contentSize;
+        private final int blockChecksum;
+        private final int blockIndependence;
+        private final int version;
+
+        public FLG() {
+<span class="nc" id="L284">            this(false);</span>
+<span class="nc" id="L285">        }</span>
+
+        public FLG(boolean blockChecksum) {
+<span class="nc bnc" id="L288" title="All 2 branches missed.">            this(0, 0, 0, blockChecksum ? 1 : 0, 1, VERSION);</span>
+<span class="nc" id="L289">        }</span>
+
+        private FLG(int reserved,
+                    int contentChecksum,
+                    int contentSize,
+                    int blockChecksum,
+                    int blockIndependence,
+<span class="nc" id="L296">                    int version) {</span>
+<span class="nc" id="L297">            this.reserved = reserved;</span>
+<span class="nc" id="L298">            this.contentChecksum = contentChecksum;</span>
+<span class="nc" id="L299">            this.contentSize = contentSize;</span>
+<span class="nc" id="L300">            this.blockChecksum = blockChecksum;</span>
+<span class="nc" id="L301">            this.blockIndependence = blockIndependence;</span>
+<span class="nc" id="L302">            this.version = version;</span>
+<span class="nc" id="L303">            validate();</span>
+<span class="nc" id="L304">        }</span>
+
+        public static FLG fromByte(byte flg) {
+<span class="nc" id="L307">            int reserved = (flg &gt;&gt;&gt; 0) &amp; 3;</span>
+<span class="nc" id="L308">            int contentChecksum = (flg &gt;&gt;&gt; 2) &amp; 1;</span>
+<span class="nc" id="L309">            int contentSize = (flg &gt;&gt;&gt; 3) &amp; 1;</span>
+<span class="nc" id="L310">            int blockChecksum = (flg &gt;&gt;&gt; 4) &amp; 1;</span>
+<span class="nc" id="L311">            int blockIndependence = (flg &gt;&gt;&gt; 5) &amp; 1;</span>
+<span class="nc" id="L312">            int version = (flg &gt;&gt;&gt; 6) &amp; 3;</span>
+
+<span class="nc" id="L314">            return new FLG(reserved,</span>
+                           contentChecksum,
+                           contentSize,
+                           blockChecksum,
+                           blockIndependence,
+                           version);
+        }
+
+        public byte toByte() {
+<span class="nc" id="L323">            return (byte) (((reserved &amp; 3) &lt;&lt; 0) | ((contentChecksum &amp; 1) &lt;&lt; 2)</span>
+                    | ((contentSize &amp; 1) &lt;&lt; 3) | ((blockChecksum &amp; 1) &lt;&lt; 4) | ((blockIndependence &amp; 1) &lt;&lt; 5) | ((version &amp; 3) &lt;&lt; 6));
+        }
+
+        private void validate() {
+<span class="nc bnc" id="L328" title="All 2 branches missed.">            if (reserved != 0) {</span>
+<span class="nc" id="L329">                throw new RuntimeException(&quot;Reserved bits must be 0&quot;);</span>
+            }
+<span class="nc bnc" id="L331" title="All 2 branches missed.">            if (blockIndependence != 1) {</span>
+<span class="nc" id="L332">                throw new RuntimeException(&quot;Dependent block stream is unsupported&quot;);</span>
+            }
+<span class="nc bnc" id="L334" title="All 2 branches missed.">            if (version != VERSION) {</span>
+<span class="nc" id="L335">                throw new RuntimeException(String.format(&quot;Version %d is unsupported&quot;, version));</span>
+            }
+<span class="nc" id="L337">        }</span>
+
+        public boolean isContentChecksumSet() {
+<span class="nc bnc" id="L340" title="All 2 branches missed.">            return contentChecksum == 1;</span>
+        }
+
+        public boolean isContentSizeSet() {
+<span class="nc bnc" id="L344" title="All 2 branches missed.">            return contentSize == 1;</span>
+        }
+
+        public boolean isBlockChecksumSet() {
+<span class="nc bnc" id="L348" title="All 2 branches missed.">            return blockChecksum == 1;</span>
+        }
+
+        public boolean isBlockIndependenceSet() {
+<span class="nc bnc" id="L352" title="All 2 branches missed.">            return blockIndependence == 1;</span>
+        }
+
+        public int getVersion() {
+<span class="nc" id="L356">            return version;</span>
+        }
+    }
+
+    public static class BD {
+
+        private final int reserved2;
+        private final int blockSizeValue;
+        private final int reserved3;
+
+        public BD() {
+<span class="nc" id="L367">            this(0, BLOCKSIZE_64KB, 0);</span>
+<span class="nc" id="L368">        }</span>
+
+        public BD(int blockSizeValue) {
+<span class="nc" id="L371">            this(0, blockSizeValue, 0);</span>
+<span class="nc" id="L372">        }</span>
+
+<span class="nc" id="L374">        private BD(int reserved2, int blockSizeValue, int reserved3) {</span>
+<span class="nc" id="L375">            this.reserved2 = reserved2;</span>
+<span class="nc" id="L376">            this.blockSizeValue = blockSizeValue;</span>
+<span class="nc" id="L377">            this.reserved3 = reserved3;</span>
+<span class="nc" id="L378">            validate();</span>
+<span class="nc" id="L379">        }</span>
+
+        public static BD fromByte(byte bd) {
+<span class="nc" id="L382">            int reserved2 = (bd &gt;&gt;&gt; 0) &amp; 15;</span>
+<span class="nc" id="L383">            int blockMaximumSize = (bd &gt;&gt;&gt; 4) &amp; 7;</span>
+<span class="nc" id="L384">            int reserved3 = (bd &gt;&gt;&gt; 7) &amp; 1;</span>
+
+<span class="nc" id="L386">            return new BD(reserved2, blockMaximumSize, reserved3);</span>
+        }
+
+        private void validate() {
+<span class="nc bnc" id="L390" title="All 2 branches missed.">            if (reserved2 != 0) {</span>
+<span class="nc" id="L391">                throw new RuntimeException(&quot;Reserved2 field must be 0&quot;);</span>
+            }
+<span class="nc bnc" id="L393" title="All 4 branches missed.">            if (blockSizeValue &lt; 4 || blockSizeValue &gt; 7) {</span>
+<span class="nc" id="L394">                throw new RuntimeException(&quot;Block size value must be between 4 and 7&quot;);</span>
+            }
+<span class="nc bnc" id="L396" title="All 2 branches missed.">            if (reserved3 != 0) {</span>
+<span class="nc" id="L397">                throw new RuntimeException(&quot;Reserved3 field must be 0&quot;);</span>
+            }
+<span class="nc" id="L399">        }</span>
+
+        // 2^(2n+8)
+        public int getBlockMaximumSize() {
+<span class="nc" id="L403">            return 1 &lt;&lt; ((2 * blockSizeValue) + 8);</span>
+        }
+
+        public byte toByte() {
+<span class="nc" id="L407">            return (byte) (((reserved2 &amp; 15) &lt;&lt; 0) | ((blockSizeValue &amp; 7) &lt;&lt; 4) | ((reserved3 &amp; 1) &lt;&lt; 7));</span>
+        }
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.6.201602180812</span></div></body></html>

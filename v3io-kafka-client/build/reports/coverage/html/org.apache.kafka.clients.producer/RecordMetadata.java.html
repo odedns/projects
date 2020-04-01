@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>RecordMetadata.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">v3io-kafka-client</a> &gt; <a href="index.source.html" class="el_package">org.apache.kafka.clients.producer</a> &gt; <span class="el_source">RecordMetadata.java</span></div><h1>RecordMetadata.java</h1><pre class="source lang-java linenums">/**
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the &quot;License&quot;); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.apache.kafka.clients.producer;
+
+import org.apache.kafka.common.TopicPartition;
+import org.apache.kafka.common.record.Record;
+
+/**
+ * The metadata for a record that has been acknowledged by the server
+ */
+public final class RecordMetadata {
+
+    /**
+     * Partition value for record without partition assigned
+     */
+    public static final int UNKNOWN_PARTITION = -1;
+
+    private final long offset;
+    // The timestamp of the message.
+    // If LogAppendTime is used for the topic, the timestamp will be the timestamp returned by the broker.
+    // If CreateTime is used for the topic, the timestamp is the timestamp in the corresponding ProducerRecord if the
+    // user provided one. Otherwise, it will be the producer local time when the producer record was handed to the
+    // producer.
+    private final long timestamp;
+    private final long checksum;
+    private final int serializedKeySize;
+    private final int serializedValueSize;
+    private final TopicPartition topicPartition;
+
+    private RecordMetadata(TopicPartition topicPartition, long offset, long timestamp, long
+        checksum, int serializedKeySize, int serializedValueSize) {
+<span class="fc" id="L46">        super();</span>
+<span class="fc" id="L47">        this.offset = offset;</span>
+<span class="fc" id="L48">        this.timestamp = timestamp;</span>
+<span class="fc" id="L49">        this.checksum = checksum;</span>
+<span class="fc" id="L50">        this.serializedKeySize = serializedKeySize;</span>
+<span class="fc" id="L51">        this.serializedValueSize = serializedValueSize;</span>
+<span class="fc" id="L52">        this.topicPartition = topicPartition;</span>
+<span class="fc" id="L53">    }</span>
+
+
+    /**
+     * convert from V3io RecordMetadata to Kafka RecordMetadata
+     * @param vrecord RecordMetadata
+     */
+    public RecordMetadata(io.iguaz.v3io.streaming.client.api.RecordMetadata vrecord)
+<span class="nc" id="L61">    {</span>
+<span class="nc" id="L62">        this.topicPartition = null;</span>
+<span class="nc" id="L63">        this.offset = vrecord.offset();</span>
+<span class="nc" id="L64">        this.timestamp = vrecord.timestamp();</span>
+<span class="nc" id="L65">        this.checksum = 0;</span>
+<span class="nc" id="L66">        this.serializedKeySize = vrecord.serializedKeySize();</span>
+<span class="nc" id="L67">        this.serializedValueSize = vrecord.serializedValueSize();</span>
+
+<span class="nc" id="L69">    }</span>
+
+    @Deprecated
+    public RecordMetadata(TopicPartition topicPartition, long baseOffset, long relativeOffset) {
+<span class="nc" id="L73">        this(topicPartition, baseOffset, relativeOffset, Record.NO_TIMESTAMP, -1, -1, -1);</span>
+<span class="nc" id="L74">    }</span>
+
+    public RecordMetadata(TopicPartition topicPartition, long baseOffset, long relativeOffset,
+                          long timestamp, long checksum, int serializedKeySize, int serializedValueSize) {
+        // ignore the relativeOffset if the base offset is -1,
+        // since this indicates the offset is unknown
+<span class="fc bfc" id="L80" title="All 2 branches covered.">        this(topicPartition, baseOffset == -1 ? baseOffset : baseOffset + relativeOffset,</span>
+             timestamp, checksum, serializedKeySize, serializedValueSize);
+<span class="fc" id="L82">    }</span>
+
+    /**
+     * The offset of the record in the topic/partition.
+     */
+    public long offset() {
+<span class="fc" id="L88">        return this.offset;</span>
+    }
+
+    /**
+     * The timestamp of the record in the topic/partition.
+     */
+    public long timestamp() {
+<span class="nc" id="L95">        return timestamp;</span>
+    }
+
+    /**
+     * The checksum (CRC32) of the record.
+     */
+    public long checksum() {
+<span class="nc" id="L102">        return this.checksum;</span>
+    }
+
+    /**
+     * The size of the serialized, uncompressed key in bytes. If key is null, the returned size
+     * is -1.
+     */
+    public int serializedKeySize() {
+<span class="nc" id="L110">        return this.serializedKeySize;</span>
+    }
+
+    /**
+     * The size of the serialized, uncompressed value in bytes. If value is null, the returned
+     * size is -1.
+     */
+    public int serializedValueSize() {
+<span class="nc" id="L118">        return this.serializedValueSize;</span>
+    }
+
+    /**
+     * The topic the record was appended to
+     */
+    public String topic() {
+<span class="fc" id="L125">        return this.topicPartition.topic();</span>
+    }
+
+    /**
+     * The partition the record was sent to
+     */
+    public int partition() {
+<span class="fc" id="L132">        return this.topicPartition.partition();</span>
+    }
+
+    @Override
+    public String toString() {
+<span class="fc" id="L137">        return topicPartition.toString() + &quot;@&quot; + offset;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.6.201602180812</span></div></body></html>

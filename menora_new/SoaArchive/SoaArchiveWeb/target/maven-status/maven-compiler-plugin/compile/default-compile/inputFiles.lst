@@ -1,0 +1,6 @@
+/home/oded/workspaces/menora_new/SoaArchive/SoaArchiveWeb/src/main/java/il/co/menora/soaarchive/web/filters/SecurityFilter.java
+/home/oded/workspaces/menora_new/SoaArchive/SoaArchiveWeb/src/main/java/il/co/menora/soaarchive/web/filters/SoaArchiveSessionListener.java
+/home/oded/workspaces/menora_new/SoaArchive/SoaArchiveWeb/src/main/java/il/co/menora/soaarchive/web/filters/ResponseFilter.java
+/home/oded/workspaces/menora_new/SoaArchive/SoaArchiveWeb/src/main/java/il/co/menora/soaarchive/web/rest/SoaArchiveService.java
+/home/oded/workspaces/menora_new/SoaArchive/SoaArchiveWeb/src/main/java/il/co/menora/soaarchive/web/rpc/SoaArchiveServiceImpl.java
+/home/oded/workspaces/menora_new/SoaArchive/SoaArchiveWeb/src/main/java/test/TestServlet.java

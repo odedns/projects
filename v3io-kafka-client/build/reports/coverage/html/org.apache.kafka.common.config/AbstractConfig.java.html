@@ -1,0 +1,301 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>AbstractConfig.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">v3io-kafka-client</a> &gt; <a href="index.source.html" class="el_package">org.apache.kafka.common.config</a> &gt; <span class="el_source">AbstractConfig.java</span></div><h1>AbstractConfig.java</h1><pre class="source lang-java linenums">/**
+ * Licensed to the Apache Software Foundation (ASF) under one or more contributor license agreements. See the NOTICE
+ * file distributed with this work for additional information regarding copyright ownership. The ASF licenses this file
+ * to You under the Apache License, Version 2.0 (the &quot;License&quot;); you may not use this file except in compliance with the
+ * License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+ * an &quot;AS IS&quot; BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
+ */
+package org.apache.kafka.common.config;
+
+import org.apache.kafka.common.Configurable;
+import org.apache.kafka.common.KafkaException;
+import org.apache.kafka.common.config.types.Password;
+import org.apache.kafka.common.utils.Utils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+
+/**
+ * A convenient base class for configurations to extend.
+ * &lt;p&gt;
+ * This class holds both the original configuration that was provided as well as the parsed
+ */
+public class AbstractConfig {
+
+<span class="nc" id="L38">    private final Logger log = LoggerFactory.getLogger(getClass());</span>
+
+    /* configs for which values have been requested, used to detect unused configs */
+    private final Set&lt;String&gt; used;
+
+    /* the original values passed in by the user */
+    private final Map&lt;String, ?&gt; originals;
+
+    /* the parsed values */
+    private final Map&lt;String, Object&gt; values;
+
+    @SuppressWarnings(&quot;unchecked&quot;)
+<span class="nc" id="L50">    public AbstractConfig(ConfigDef definition, Map&lt;?, ?&gt; originals, boolean doLog) {</span>
+        /* check that all the keys are really strings */
+<span class="nc bnc" id="L52" title="All 2 branches missed.">        for (Object key : originals.keySet())</span>
+<span class="nc bnc" id="L53" title="All 2 branches missed.">            if (!(key instanceof String))</span>
+<span class="nc" id="L54">                throw new ConfigException(key.toString(), originals.get(key), &quot;Key must be a string.&quot;);</span>
+<span class="nc" id="L55">        this.originals = (Map&lt;String, ?&gt;) originals;</span>
+<span class="nc" id="L56">        this.values = definition.parse(this.originals);</span>
+<span class="nc" id="L57">        this.used = Collections.synchronizedSet(new HashSet&lt;String&gt;());</span>
+<span class="nc bnc" id="L58" title="All 2 branches missed.">        if (doLog)</span>
+<span class="nc" id="L59">            logAll();</span>
+<span class="nc" id="L60">    }</span>
+
+    public AbstractConfig(ConfigDef definition, Map&lt;?, ?&gt; originals) {
+<span class="nc" id="L63">        this(definition, originals, true);</span>
+<span class="nc" id="L64">    }</span>
+
+<span class="nc" id="L66">    public AbstractConfig(Map&lt;String, Object&gt; parsedConfig) {</span>
+<span class="nc" id="L67">        this.values = parsedConfig;</span>
+<span class="nc" id="L68">        this.originals = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L69">        this.used = Collections.synchronizedSet(new HashSet&lt;String&gt;());</span>
+<span class="nc" id="L70">    }</span>
+
+    protected Object get(String key) {
+<span class="nc bnc" id="L73" title="All 2 branches missed.">        if (!values.containsKey(key))</span>
+<span class="nc" id="L74">            throw new ConfigException(String.format(&quot;Unknown configuration '%s'&quot;, key));</span>
+            //log.warn(String.format(&quot;Unknown configuration '%s'&quot;, key));
+<span class="nc" id="L76">        used.add(key);</span>
+<span class="nc" id="L77">        return values.get(key);</span>
+    }
+
+    public void ignore(String key) {
+<span class="nc" id="L81">        used.add(key);</span>
+<span class="nc" id="L82">    }</span>
+
+    public Short getShort(String key) {
+<span class="nc" id="L85">        return (Short) get(key);</span>
+    }
+
+    public Integer getInt(String key) {
+<span class="nc" id="L89">        return (Integer) get(key);</span>
+    }
+
+    public Long getLong(String key) {
+<span class="nc" id="L93">        return (Long) get(key);</span>
+    }
+
+    public Double getDouble(String key) {
+<span class="nc" id="L97">        return (Double) get(key);</span>
+    }
+
+    @SuppressWarnings(&quot;unchecked&quot;)
+    public List&lt;String&gt; getList(String key) {
+<span class="nc" id="L102">        return (List&lt;String&gt;) get(key);</span>
+    }
+
+    public Boolean getBoolean(String key) {
+<span class="nc" id="L106">        return (Boolean) get(key);</span>
+    }
+
+    public String getString(String key) {
+<span class="nc" id="L110">        return (String) get(key);</span>
+    }
+
+    public Password getPassword(String key) {
+<span class="nc" id="L114">        return (Password) get(key);</span>
+    }
+
+    public Class&lt;?&gt; getClass(String key) {
+<span class="nc" id="L118">        return (Class&lt;?&gt;) get(key);</span>
+    }
+
+    public Set&lt;String&gt; unused() {
+<span class="nc" id="L122">        Set&lt;String&gt; keys = new HashSet&lt;&gt;(originals.keySet());</span>
+<span class="nc" id="L123">        keys.removeAll(used);</span>
+<span class="nc" id="L124">        return keys;</span>
+    }
+
+    public Map&lt;String, Object&gt; originals() {
+<span class="nc" id="L128">        Map&lt;String, Object&gt; copy = new RecordingMap&lt;&gt;();</span>
+<span class="nc" id="L129">        copy.putAll(originals);</span>
+<span class="nc" id="L130">        return copy;</span>
+    }
+
+    /**
+     * Get all the original settings, ensuring that all values are of type String.
+     * @return the original settings
+     * @throws ClassCastException if any of the values are not strings
+     */
+    public Map&lt;String, String&gt; originalsStrings() {
+<span class="nc" id="L139">        Map&lt;String, String&gt; copy = new RecordingMap&lt;&gt;();</span>
+<span class="nc bnc" id="L140" title="All 2 branches missed.">        for (Map.Entry&lt;String, ?&gt; entry : originals.entrySet()) {</span>
+<span class="nc bnc" id="L141" title="All 2 branches missed.">            if (!(entry.getValue() instanceof String))</span>
+<span class="nc" id="L142">                throw new ClassCastException(&quot;Non-string value found in original settings for key &quot; + entry.getKey() +</span>
+<span class="nc bnc" id="L143" title="All 2 branches missed.">                        &quot;: &quot; + (entry.getValue() == null ? null : entry.getValue().getClass().getName()));</span>
+<span class="nc" id="L144">            copy.put(entry.getKey(), (String) entry.getValue());</span>
+<span class="nc" id="L145">        }</span>
+<span class="nc" id="L146">        return copy;</span>
+    }
+
+    /**
+     * Gets all original settings with the given prefix, stripping the prefix before adding it to the output.
+     *
+     * @param prefix the prefix to use as a filter
+     * @return a Map containing the settings with the prefix
+     */
+    public Map&lt;String, Object&gt; originalsWithPrefix(String prefix) {
+<span class="nc" id="L156">        Map&lt;String, Object&gt; result = new RecordingMap&lt;&gt;(prefix);</span>
+<span class="nc bnc" id="L157" title="All 2 branches missed.">        for (Map.Entry&lt;String, ?&gt; entry : originals.entrySet()) {</span>
+<span class="nc bnc" id="L158" title="All 4 branches missed.">            if (entry.getKey().startsWith(prefix) &amp;&amp; entry.getKey().length() &gt; prefix.length())</span>
+<span class="nc" id="L159">                result.put(entry.getKey().substring(prefix.length()), entry.getValue());</span>
+<span class="nc" id="L160">        }</span>
+<span class="nc" id="L161">        return result;</span>
+    }
+
+    public Map&lt;String, ?&gt; values() {
+<span class="nc" id="L165">        return new RecordingMap&lt;&gt;(values);</span>
+    }
+
+    private void logAll() {
+<span class="nc" id="L169">        StringBuilder b = new StringBuilder();</span>
+<span class="nc" id="L170">        b.append(getClass().getSimpleName());</span>
+<span class="nc" id="L171">        b.append(&quot; values: &quot;);</span>
+<span class="nc" id="L172">        b.append(Utils.NL);</span>
+
+<span class="nc bnc" id="L174" title="All 2 branches missed.">        for (Map.Entry&lt;String, Object&gt; entry : new TreeMap&lt;&gt;(this.values).entrySet()) {</span>
+<span class="nc" id="L175">            b.append('\t');</span>
+<span class="nc" id="L176">            b.append(entry.getKey());</span>
+<span class="nc" id="L177">            b.append(&quot; = &quot;);</span>
+<span class="nc" id="L178">            b.append(entry.getValue());</span>
+<span class="nc" id="L179">            b.append(Utils.NL);</span>
+<span class="nc" id="L180">        }</span>
+<span class="nc" id="L181">        log.info(b.toString());</span>
+<span class="nc" id="L182">    }</span>
+
+    /**
+     * Log warnings for any unused configurations
+     */
+    public void logUnused() {
+<span class="nc bnc" id="L188" title="All 2 branches missed.">        for (String key : unused())</span>
+<span class="nc" id="L189">            log.warn(&quot;The configuration '{}' was supplied but isn't a known config.&quot;, key);</span>
+<span class="nc" id="L190">    }</span>
+
+    /**
+     * Get a configured instance of the give class specified by the given configuration key. If the object implements
+     * Configurable configure it using the configuration.
+     *
+     * @param key The configuration key for the class
+     * @param t The interface the class should implement
+     * @return A configured instance of the class
+     */
+    public &lt;T&gt; T getConfiguredInstance(String key, Class&lt;T&gt; t) {
+<span class="nc" id="L201">        Class&lt;?&gt; c = getClass(key);</span>
+<span class="nc bnc" id="L202" title="All 2 branches missed.">        if (c == null)</span>
+<span class="nc" id="L203">            return null;</span>
+<span class="nc" id="L204">        Object o = Utils.newInstance(c);</span>
+<span class="nc bnc" id="L205" title="All 2 branches missed.">        if (!t.isInstance(o))</span>
+<span class="nc" id="L206">            throw new KafkaException(c.getName() + &quot; is not an instance of &quot; + t.getName());</span>
+<span class="nc bnc" id="L207" title="All 2 branches missed.">        if (o instanceof Configurable)</span>
+<span class="nc" id="L208">            ((Configurable) o).configure(originals());</span>
+<span class="nc" id="L209">        return t.cast(o);</span>
+    }
+
+    /**
+     * Get a list of configured instances of the given class specified by the given configuration key. The configuration
+     * may specify either null or an empty string to indicate no configured instances. In both cases, this method
+     * returns an empty list to indicate no configured instances.
+     * @param key The configuration key for the class
+     * @param t The interface the class should implement
+     * @return The list of configured instances
+     */
+    public &lt;T&gt; List&lt;T&gt; getConfiguredInstances(String key, Class&lt;T&gt; t) {
+<span class="nc" id="L221">        List&lt;String&gt; klasses = getList(key);</span>
+<span class="nc" id="L222">        List&lt;T&gt; objects = new ArrayList&lt;T&gt;();</span>
+<span class="nc bnc" id="L223" title="All 2 branches missed.">        if (klasses == null)</span>
+<span class="nc" id="L224">            return objects;</span>
+<span class="nc bnc" id="L225" title="All 2 branches missed.">        for (Object klass : klasses) {</span>
+            Object o;
+<span class="nc bnc" id="L227" title="All 2 branches missed.">            if (klass instanceof String) {</span>
+                try {
+<span class="nc" id="L229">                    o = Utils.newInstance((String) klass, t);</span>
+<span class="nc" id="L230">                } catch (ClassNotFoundException e) {</span>
+<span class="nc" id="L231">                    throw new KafkaException(klass + &quot; ClassNotFoundException exception occured&quot;, e);</span>
+<span class="nc" id="L232">                }</span>
+<span class="nc bnc" id="L233" title="All 2 branches missed.">            } else if (klass instanceof Class&lt;?&gt;) {</span>
+<span class="nc" id="L234">                o = Utils.newInstance((Class&lt;?&gt;) klass);</span>
+            } else
+<span class="nc" id="L236">                throw new KafkaException(&quot;List contains element of type &quot; + klass.getClass() + &quot;, expected String or Class&quot;);</span>
+<span class="nc bnc" id="L237" title="All 2 branches missed.">            if (!t.isInstance(o))</span>
+<span class="nc" id="L238">                throw new KafkaException(klass + &quot; is not an instance of &quot; + t.getName());</span>
+<span class="nc bnc" id="L239" title="All 2 branches missed.">            if (o instanceof Configurable)</span>
+<span class="nc" id="L240">                ((Configurable) o).configure(originals());</span>
+<span class="nc" id="L241">            objects.add(t.cast(o));</span>
+<span class="nc" id="L242">        }</span>
+<span class="nc" id="L243">        return objects;</span>
+    }
+
+    @Override
+    public boolean equals(Object o) {
+<span class="nc bnc" id="L248" title="All 2 branches missed.">        if (this == o) return true;</span>
+<span class="nc bnc" id="L249" title="All 4 branches missed.">        if (o == null || getClass() != o.getClass()) return false;</span>
+
+<span class="nc" id="L251">        AbstractConfig that = (AbstractConfig) o;</span>
+
+<span class="nc" id="L253">        return originals.equals(that.originals);</span>
+    }
+
+    @Override
+    public int hashCode() {
+<span class="nc" id="L258">        return originals.hashCode();</span>
+    }
+
+    /**
+     * Marks keys retrieved via `get` as used. This is needed because `Configurable.configure` takes a `Map` instead
+     * of an `AbstractConfig` and we can't change that without breaking public API like `Partitioner`.
+     */
+    private class RecordingMap&lt;V&gt; extends HashMap&lt;String, V&gt; {
+
+        private final String prefix;
+
+        RecordingMap() {
+<span class="nc" id="L270">            this(&quot;&quot;);</span>
+<span class="nc" id="L271">        }</span>
+
+<span class="nc" id="L273">        RecordingMap(String prefix) {</span>
+<span class="nc" id="L274">            this.prefix = prefix;</span>
+<span class="nc" id="L275">        }</span>
+
+        RecordingMap(Map&lt;String, ? extends V&gt; m) {
+<span class="nc" id="L278">            this(m, &quot;&quot;);</span>
+<span class="nc" id="L279">        }</span>
+
+<span class="nc" id="L281">        RecordingMap(Map&lt;String, ? extends V&gt; m, String prefix) {</span>
+<span class="nc" id="L282">            super(m);</span>
+<span class="nc" id="L283">            this.prefix = prefix;</span>
+<span class="nc" id="L284">        }</span>
+
+        @Override
+        public V get(Object key) {
+<span class="nc bnc" id="L288" title="All 2 branches missed.">            if (key instanceof String) {</span>
+                String keyWithPrefix;
+<span class="nc bnc" id="L290" title="All 2 branches missed.">                if (prefix.isEmpty()) {</span>
+<span class="nc" id="L291">                    keyWithPrefix = (String) key;</span>
+                } else {
+<span class="nc" id="L293">                    keyWithPrefix = prefix + key;</span>
+                }
+<span class="nc" id="L295">                ignore(keyWithPrefix);</span>
+            }
+<span class="nc" id="L297">            return super.get(key);</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.6.201602180812</span></div></body></html>

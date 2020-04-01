@@ -1,0 +1,53 @@
+K 25
+svn:wc:ra_dav:version-url
+V 96
+/mnr_repos/ESB/!svn/ver/382/SoaArchiveClient/src/main/java/il/co/menora/soaarchive/client/places
+END
+OutgoingPlace.java
+K 25
+svn:wc:ra_dav:version-url
+V 115
+/mnr_repos/ESB/!svn/ver/382/SoaArchiveClient/src/main/java/il/co/menora/soaarchive/client/places/OutgoingPlace.java
+END
+PlaceUtils.java
+K 25
+svn:wc:ra_dav:version-url
+V 112
+/mnr_repos/ESB/!svn/ver/382/SoaArchiveClient/src/main/java/il/co/menora/soaarchive/client/places/PlaceUtils.java
+END
+ClientPlaceHistoryMapper.java
+K 25
+svn:wc:ra_dav:version-url
+V 126
+/mnr_repos/ESB/!svn/ver/382/SoaArchiveClient/src/main/java/il/co/menora/soaarchive/client/places/ClientPlaceHistoryMapper.java
+END
+ClientPlaceController.java
+K 25
+svn:wc:ra_dav:version-url
+V 123
+/mnr_repos/ESB/!svn/ver/382/SoaArchiveClient/src/main/java/il/co/menora/soaarchive/client/places/ClientPlaceController.java
+END
+HomePlace.java
+K 25
+svn:wc:ra_dav:version-url
+V 111
+/mnr_repos/ESB/!svn/ver/382/SoaArchiveClient/src/main/java/il/co/menora/soaarchive/client/places/HomePlace.java
+END
+WorkQueuePlace.java
+K 25
+svn:wc:ra_dav:version-url
+V 116
+/mnr_repos/ESB/!svn/ver/382/SoaArchiveClient/src/main/java/il/co/menora/soaarchive/client/places/WorkQueuePlace.java
+END
+AbstractPlace.java
+K 25
+svn:wc:ra_dav:version-url
+V 115
+/mnr_repos/ESB/!svn/ver/382/SoaArchiveClient/src/main/java/il/co/menora/soaarchive/client/places/AbstractPlace.java
+END
+ClientPlaceHistoryHandler.java
+K 25
+svn:wc:ra_dav:version-url
+V 127
+/mnr_repos/ESB/!svn/ver/382/SoaArchiveClient/src/main/java/il/co/menora/soaarchive/client/places/ClientPlaceHistoryHandler.java
+END

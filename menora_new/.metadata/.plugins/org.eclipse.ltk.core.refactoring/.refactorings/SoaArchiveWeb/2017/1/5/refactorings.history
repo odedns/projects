@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Move &apos;log4j2.xml&apos; to &apos;java&apos;" description="Move &apos;log4j2.xml&apos; to &apos;java&apos;" destination="src/main/java" element1="src/main/webapp/log4j2.xml" flags="7" id="org.eclipse.ltk.core.refactoring.move.resources" resources="1" stamp="1485786848469" updateReferences="true"/>
+</session>

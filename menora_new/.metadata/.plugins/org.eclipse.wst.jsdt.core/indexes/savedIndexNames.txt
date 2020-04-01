@@ -1,0 +1,8 @@
+INDEX VERSION 1.4+/home/oded/workspaces/menora_new/.metadata/.plugins/org.eclipse.wst.jsdt.core/indexes
+4224949679.index
+3400064110.index
+285772604.index
+3252272008.index
+682174439.index
+1230915143.index
+111123475.index

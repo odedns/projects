@@ -1,0 +1,35 @@
+K 25
+svn:wc:ra_dav:version-url
+V 45
+/mnr_repos/ESB/!svn/ver/384/SoaArchiveEjb/lib
+END
+com.ibm.mq.headers.jar
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/mnr_repos/ESB/!svn/ver/384/SoaArchiveEjb/lib/com.ibm.mq.headers.jar
+END
+com.ibm.mq.jar
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/mnr_repos/ESB/!svn/ver/384/SoaArchiveEjb/lib/com.ibm.mq.jar
+END
+ojdbc6.jar
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/mnr_repos/ESB/!svn/ver/384/SoaArchiveEjb/lib/ojdbc6.jar
+END
+com.ibm.mq.jmqi.jar
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/mnr_repos/ESB/!svn/ver/384/SoaArchiveEjb/lib/com.ibm.mq.jmqi.jar
+END
+com.ibm.mq.pcf.jar
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/mnr_repos/ESB/!svn/ver/384/SoaArchiveEjb/lib/com.ibm.mq.pcf.jar
+END

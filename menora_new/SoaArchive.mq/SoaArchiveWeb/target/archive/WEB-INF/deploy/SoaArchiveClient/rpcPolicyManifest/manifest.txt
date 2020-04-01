@@ -1,0 +1,3 @@
+# Module SoaArchiveClient
+# RPC service class, partial path of RPC policy file
+il.co.menora.soaarchive.client.rpc.SoaArchiveService, DE48FB3FCF93DF4A5F8EB85FAD18923A.gwt.rpc

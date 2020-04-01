@@ -1,0 +1,5 @@
+funkey\dao\Command.class
+funkey\app\WebSecurityConfig.class
+funkey\dao\CommandsDao.class
+funkey\app\FunkeyApp.class
+funkey\service\DataService.class

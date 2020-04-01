@@ -1,0 +1,10 @@
+il/co/menora/soaarchive/mq/MQRequestsHandler.class
+il/co/menora/soaarchive/mq/SendMQResponse.class
+il/co/menora/soaarchive/entities/QMgrConnData.class
+il/co/menora/soaarchive/ejb/GeneralBean.class
+il/co/menora/soaarchive/entities/Outgoing.class
+il/co/menora/soaarchive/entities/Payload.class
+il/co/menora/soaarchive/entities/QmgrAlias.class
+il/co/menora/soaarchive/mq/SendMQRequest.class
+il/co/menora/soaarchive/ejb/IncomingDao.class
+il/co/menora/soaarchive/entities/Incoming.class

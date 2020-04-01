@@ -1,0 +1,77 @@
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/mnr_repos/ESB/!svn/ver/382/SoaArchiveClient/src/main/java/il/co/menora/soaarchive/shared
+END
+Statuses.java
+K 25
+svn:wc:ra_dav:version-url
+V 103
+/mnr_repos/ESB/!svn/ver/397/SoaArchiveClient/src/main/java/il/co/menora/soaarchive/shared/Statuses.java
+END
+OutgoingResponse.java
+K 25
+svn:wc:ra_dav:version-url
+V 111
+/mnr_repos/ESB/!svn/ver/382/SoaArchiveClient/src/main/java/il/co/menora/soaarchive/shared/OutgoingResponse.java
+END
+StatusDto.java
+K 25
+svn:wc:ra_dav:version-url
+V 104
+/mnr_repos/ESB/!svn/ver/397/SoaArchiveClient/src/main/java/il/co/menora/soaarchive/shared/StatusDto.java
+END
+IncomingDtoEx.java
+K 25
+svn:wc:ra_dav:version-url
+V 108
+/mnr_repos/ESB/!svn/ver/382/SoaArchiveClient/src/main/java/il/co/menora/soaarchive/shared/IncomingDtoEx.java
+END
+MQDto.java
+K 25
+svn:wc:ra_dav:version-url
+V 100
+/mnr_repos/ESB/!svn/ver/382/SoaArchiveClient/src/main/java/il/co/menora/soaarchive/shared/MQDto.java
+END
+SOAServiceType.java
+K 25
+svn:wc:ra_dav:version-url
+V 109
+/mnr_repos/ESB/!svn/ver/382/SoaArchiveClient/src/main/java/il/co/menora/soaarchive/shared/SOAServiceType.java
+END
+IncomingDto.java
+K 25
+svn:wc:ra_dav:version-url
+V 106
+/mnr_repos/ESB/!svn/ver/397/SoaArchiveClient/src/main/java/il/co/menora/soaarchive/shared/IncomingDto.java
+END
+IncomingResponse.java
+K 25
+svn:wc:ra_dav:version-url
+V 111
+/mnr_repos/ESB/!svn/ver/382/SoaArchiveClient/src/main/java/il/co/menora/soaarchive/shared/IncomingResponse.java
+END
+SearchDto.java
+K 25
+svn:wc:ra_dav:version-url
+V 104
+/mnr_repos/ESB/!svn/ver/382/SoaArchiveClient/src/main/java/il/co/menora/soaarchive/shared/SearchDto.java
+END
+MQResponse.java
+K 25
+svn:wc:ra_dav:version-url
+V 105
+/mnr_repos/ESB/!svn/ver/382/SoaArchiveClient/src/main/java/il/co/menora/soaarchive/shared/MQResponse.java
+END
+OutgoingDto.java
+K 25
+svn:wc:ra_dav:version-url
+V 106
+/mnr_repos/ESB/!svn/ver/397/SoaArchiveClient/src/main/java/il/co/menora/soaarchive/shared/OutgoingDto.java
+END
+ApplicationInfoDto.java
+K 25
+svn:wc:ra_dav:version-url
+V 113
+/mnr_repos/ESB/!svn/ver/382/SoaArchiveClient/src/main/java/il/co/menora/soaarchive/shared/ApplicationInfoDto.java
+END

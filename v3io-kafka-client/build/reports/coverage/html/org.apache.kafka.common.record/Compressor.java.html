@@ -1,0 +1,333 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>Compressor.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">v3io-kafka-client</a> &gt; <a href="index.source.html" class="el_package">org.apache.kafka.common.record</a> &gt; <span class="el_source">Compressor.java</span></div><h1>Compressor.java</h1><pre class="source lang-java linenums">/**
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the &quot;License&quot;); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.apache.kafka.common.record;
+
+import java.lang.reflect.Constructor;
+import org.apache.kafka.common.KafkaException;
+import org.apache.kafka.common.utils.Utils;
+
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
+
+public class Compressor {
+
+    static private final float COMPRESSION_RATE_DAMPING_FACTOR = 0.9f;
+    static private final float COMPRESSION_RATE_ESTIMATION_FACTOR = 1.05f;
+    static private final int COMPRESSION_DEFAULT_BUFFER_SIZE = 1024;
+
+    private static final float[] TYPE_TO_RATE;
+
+    static {
+<span class="nc" id="L41">        int maxTypeId = -1;</span>
+<span class="nc bnc" id="L42" title="All 2 branches missed.">        for (CompressionType type : CompressionType.values())</span>
+<span class="nc" id="L43">            maxTypeId = Math.max(maxTypeId, type.id);</span>
+<span class="nc" id="L44">        TYPE_TO_RATE = new float[maxTypeId + 1];</span>
+<span class="nc bnc" id="L45" title="All 2 branches missed.">        for (CompressionType type : CompressionType.values()) {</span>
+<span class="nc" id="L46">            TYPE_TO_RATE[type.id] = type.rate;</span>
+        }
+    }
+
+    // dynamically load the snappy and lz4 classes to avoid runtime dependency if we are not using compression
+    // caching constructors to avoid invoking of Class.forName method for each batch
+<span class="nc" id="L52">    private static MemoizingConstructorSupplier snappyOutputStreamSupplier = new MemoizingConstructorSupplier(new ConstructorSupplier() {</span>
+        @Override
+        public Constructor get() throws ClassNotFoundException, NoSuchMethodException {
+<span class="nc" id="L55">            return Class.forName(&quot;org.xerial.snappy.SnappyOutputStream&quot;)</span>
+<span class="nc" id="L56">                .getConstructor(OutputStream.class, Integer.TYPE);</span>
+        }
+    });
+
+<span class="nc" id="L60">    private static MemoizingConstructorSupplier lz4OutputStreamSupplier = new MemoizingConstructorSupplier(new ConstructorSupplier() {</span>
+        @Override
+        public Constructor get() throws ClassNotFoundException, NoSuchMethodException {
+<span class="nc" id="L63">            return Class.forName(&quot;org.apache.kafka.common.record.KafkaLZ4BlockOutputStream&quot;)</span>
+<span class="nc" id="L64">                .getConstructor(OutputStream.class);</span>
+        }
+    });
+
+<span class="nc" id="L68">    private static MemoizingConstructorSupplier snappyInputStreamSupplier = new MemoizingConstructorSupplier(new ConstructorSupplier() {</span>
+        @Override
+        public Constructor get() throws ClassNotFoundException, NoSuchMethodException {
+<span class="nc" id="L71">            return Class.forName(&quot;org.xerial.snappy.SnappyInputStream&quot;)</span>
+<span class="nc" id="L72">                .getConstructor(InputStream.class);</span>
+        }
+    });
+
+<span class="nc" id="L76">    private static MemoizingConstructorSupplier lz4InputStreamSupplier = new MemoizingConstructorSupplier(new ConstructorSupplier() {</span>
+        @Override
+        public Constructor get() throws ClassNotFoundException, NoSuchMethodException {
+<span class="nc" id="L79">            return Class.forName(&quot;org.apache.kafka.common.record.KafkaLZ4BlockInputStream&quot;)</span>
+<span class="nc" id="L80">                .getConstructor(InputStream.class, Boolean.TYPE);</span>
+        }
+    });
+
+    private final CompressionType type;
+    private final DataOutputStream appendStream;
+    private final ByteBufferOutputStream bufferStream;
+    private final int initPos;
+
+    public long writtenUncompressed;
+    public long numRecords;
+    public float compressionRate;
+    public long maxTimestamp;
+
+<span class="nc" id="L94">    public Compressor(ByteBuffer buffer, CompressionType type) {</span>
+<span class="nc" id="L95">        this.type = type;</span>
+<span class="nc" id="L96">        this.initPos = buffer.position();</span>
+
+<span class="nc" id="L98">        this.numRecords = 0;</span>
+<span class="nc" id="L99">        this.writtenUncompressed = 0;</span>
+<span class="nc" id="L100">        this.compressionRate = 1;</span>
+<span class="nc" id="L101">        this.maxTimestamp = Record.NO_TIMESTAMP;</span>
+
+<span class="nc bnc" id="L103" title="All 2 branches missed.">        if (type != CompressionType.NONE) {</span>
+            // for compressed records, leave space for the header and the shallow message metadata
+            // and move the starting position to the value payload offset
+<span class="nc" id="L106">            buffer.position(initPos + Records.LOG_OVERHEAD + Record.RECORD_OVERHEAD);</span>
+        }
+
+        // create the stream
+<span class="nc" id="L110">        bufferStream = new ByteBufferOutputStream(buffer);</span>
+<span class="nc" id="L111">        appendStream = wrapForOutput(bufferStream, type, COMPRESSION_DEFAULT_BUFFER_SIZE);</span>
+<span class="nc" id="L112">    }</span>
+
+    public ByteBuffer buffer() {
+<span class="nc" id="L115">        return bufferStream.buffer();</span>
+    }
+
+    public double compressionRate() {
+<span class="nc" id="L119">        return compressionRate;</span>
+    }
+
+    public void close() {
+        try {
+<span class="nc" id="L124">            appendStream.close();</span>
+<span class="nc" id="L125">        } catch (IOException e) {</span>
+<span class="nc" id="L126">            throw new KafkaException(e);</span>
+<span class="nc" id="L127">        }</span>
+
+<span class="nc bnc" id="L129" title="All 2 branches missed.">        if (type != CompressionType.NONE) {</span>
+<span class="nc" id="L130">            ByteBuffer buffer = bufferStream.buffer();</span>
+<span class="nc" id="L131">            int pos = buffer.position();</span>
+            // write the header, for the end offset write as number of records - 1
+<span class="nc" id="L133">            buffer.position(initPos);</span>
+<span class="nc" id="L134">            buffer.putLong(numRecords - 1);</span>
+<span class="nc" id="L135">            buffer.putInt(pos - initPos - Records.LOG_OVERHEAD);</span>
+            // write the shallow message (the crc and value size are not correct yet)
+<span class="nc" id="L137">            Record.write(buffer, maxTimestamp, null, null, type, 0, -1);</span>
+            // compute the fill the value size
+<span class="nc" id="L139">            int valueSize = pos - initPos - Records.LOG_OVERHEAD - Record.RECORD_OVERHEAD;</span>
+<span class="nc" id="L140">            buffer.putInt(initPos + Records.LOG_OVERHEAD + Record.KEY_OFFSET_V1, valueSize);</span>
+            // compute and fill the crc at the beginning of the message
+<span class="nc" id="L142">            long crc = Record.computeChecksum(buffer,</span>
+                initPos + Records.LOG_OVERHEAD + Record.MAGIC_OFFSET,
+                pos - initPos - Records.LOG_OVERHEAD - Record.MAGIC_OFFSET);
+<span class="nc" id="L145">            Utils.writeUnsignedInt(buffer, initPos + Records.LOG_OVERHEAD + Record.CRC_OFFSET, crc);</span>
+            // reset the position
+<span class="nc" id="L147">            buffer.position(pos);</span>
+
+            // update the compression ratio
+<span class="nc" id="L150">            this.compressionRate = (float) buffer.position() / this.writtenUncompressed;</span>
+<span class="nc" id="L151">            TYPE_TO_RATE[type.id] = TYPE_TO_RATE[type.id] * COMPRESSION_RATE_DAMPING_FACTOR +</span>
+                compressionRate * (1 - COMPRESSION_RATE_DAMPING_FACTOR);
+        }
+<span class="nc" id="L154">    }</span>
+
+    // Note that for all the write operations below, IO exceptions should
+    // never be thrown since the underlying ByteBufferOutputStream does not throw IOException;
+    // therefore upon encountering this issue we just close the append stream.
+
+    public void putLong(final long value) {
+        try {
+<span class="nc" id="L162">            appendStream.writeLong(value);</span>
+<span class="nc" id="L163">        } catch (IOException e) {</span>
+<span class="nc" id="L164">            throw new KafkaException(&quot;I/O exception when writing to the append stream, closing&quot;, e);</span>
+<span class="nc" id="L165">        }</span>
+<span class="nc" id="L166">    }</span>
+
+    public void putInt(final int value) {
+        try {
+<span class="nc" id="L170">            appendStream.writeInt(value);</span>
+<span class="nc" id="L171">        } catch (IOException e) {</span>
+<span class="nc" id="L172">            throw new KafkaException(&quot;I/O exception when writing to the append stream, closing&quot;, e);</span>
+<span class="nc" id="L173">        }</span>
+<span class="nc" id="L174">    }</span>
+
+    public void put(final ByteBuffer buffer) {
+        try {
+<span class="nc" id="L178">            appendStream.write(buffer.array(), buffer.arrayOffset(), buffer.limit());</span>
+<span class="nc" id="L179">        } catch (IOException e) {</span>
+<span class="nc" id="L180">            throw new KafkaException(&quot;I/O exception when writing to the append stream, closing&quot;, e);</span>
+<span class="nc" id="L181">        }</span>
+<span class="nc" id="L182">    }</span>
+
+    public void putByte(final byte value) {
+        try {
+<span class="nc" id="L186">            appendStream.write(value);</span>
+<span class="nc" id="L187">        } catch (IOException e) {</span>
+<span class="nc" id="L188">            throw new KafkaException(&quot;I/O exception when writing to the append stream, closing&quot;, e);</span>
+<span class="nc" id="L189">        }</span>
+<span class="nc" id="L190">    }</span>
+
+    public void put(final byte[] bytes, final int offset, final int len) {
+        try {
+<span class="nc" id="L194">            appendStream.write(bytes, offset, len);</span>
+<span class="nc" id="L195">        } catch (IOException e) {</span>
+<span class="nc" id="L196">            throw new KafkaException(&quot;I/O exception when writing to the append stream, closing&quot;, e);</span>
+<span class="nc" id="L197">        }</span>
+<span class="nc" id="L198">    }</span>
+
+    /**
+     * @return CRC of the record
+     */
+    public long putRecord(long timestamp, byte[] key, byte[] value, CompressionType type,
+                          int valueOffset, int valueSize) {
+        // put a record as un-compressed into the underlying stream
+<span class="nc" id="L206">        long crc = Record.computeChecksum(timestamp, key, value, type, valueOffset, valueSize);</span>
+<span class="nc" id="L207">        byte attributes = Record.computeAttributes(type);</span>
+<span class="nc" id="L208">        putRecord(crc, attributes, timestamp, key, value, valueOffset, valueSize);</span>
+<span class="nc" id="L209">        return crc;</span>
+    }
+
+    /**
+     * Put a record as uncompressed into the underlying stream
+     * @return CRC of the record
+     */
+    public long putRecord(long timestamp, byte[] key, byte[] value) {
+<span class="nc" id="L217">        return putRecord(timestamp, key, value, CompressionType.NONE, 0, -1);</span>
+    }
+
+    private void putRecord(final long crc, final byte attributes, final long timestamp, final byte[] key, final byte[] value, final int valueOffset, final int valueSize) {
+<span class="nc" id="L221">        maxTimestamp = Math.max(maxTimestamp, timestamp);</span>
+<span class="nc" id="L222">        Record.write(this, crc, attributes, timestamp, key, value, valueOffset, valueSize);</span>
+<span class="nc" id="L223">    }</span>
+
+    public void recordWritten(int size) {
+<span class="nc" id="L226">        numRecords += 1;</span>
+<span class="nc" id="L227">        writtenUncompressed += size;</span>
+<span class="nc" id="L228">    }</span>
+
+    public long numRecordsWritten() {
+<span class="nc" id="L231">        return numRecords;</span>
+    }
+
+    public long estimatedBytesWritten() {
+<span class="nc bnc" id="L235" title="All 2 branches missed.">        if (type == CompressionType.NONE) {</span>
+<span class="nc" id="L236">            return bufferStream.buffer().position();</span>
+        } else {
+            // estimate the written bytes to the underlying byte buffer based on uncompressed written bytes
+<span class="nc" id="L239">            return (long) (writtenUncompressed * TYPE_TO_RATE[type.id] * COMPRESSION_RATE_ESTIMATION_FACTOR);</span>
+        }
+    }
+
+    // the following two functions also need to be public since they are used in MemoryRecords.iteration
+
+    public static DataOutputStream wrapForOutput(ByteBufferOutputStream buffer, CompressionType type, int bufferSize) {
+        try {
+<span class="nc bnc" id="L247" title="All 5 branches missed.">            switch (type) {</span>
+                case NONE:
+<span class="nc" id="L249">                    return new DataOutputStream(buffer);</span>
+                case GZIP:
+<span class="nc" id="L251">                    return new DataOutputStream(new GZIPOutputStream(buffer, bufferSize));</span>
+                case SNAPPY:
+                    try {
+<span class="nc" id="L254">                        OutputStream stream = (OutputStream) snappyOutputStreamSupplier.get().newInstance(buffer, bufferSize);</span>
+<span class="nc" id="L255">                        return new DataOutputStream(stream);</span>
+<span class="nc" id="L256">                    } catch (Exception e) {</span>
+<span class="nc" id="L257">                        throw new KafkaException(e);</span>
+                    }
+                case LZ4:
+                    try {
+<span class="nc" id="L261">                        OutputStream stream = (OutputStream) lz4OutputStreamSupplier.get().newInstance(buffer);</span>
+<span class="nc" id="L262">                        return new DataOutputStream(stream);</span>
+<span class="nc" id="L263">                    } catch (Exception e) {</span>
+<span class="nc" id="L264">                        throw new KafkaException(e);</span>
+                    }
+                default:
+<span class="nc" id="L267">                    throw new IllegalArgumentException(&quot;Unknown compression type: &quot; + type);</span>
+            }
+<span class="nc" id="L269">        } catch (IOException e) {</span>
+<span class="nc" id="L270">            throw new KafkaException(e);</span>
+        }
+    }
+
+    public static DataInputStream wrapForInput(ByteBufferInputStream buffer, CompressionType type, byte messageVersion) {
+        try {
+<span class="nc bnc" id="L276" title="All 5 branches missed.">            switch (type) {</span>
+                case NONE:
+<span class="nc" id="L278">                    return new DataInputStream(buffer);</span>
+                case GZIP:
+<span class="nc" id="L280">                    return new DataInputStream(new GZIPInputStream(buffer));</span>
+                case SNAPPY:
+                    try {
+<span class="nc" id="L283">                        InputStream stream = (InputStream) snappyInputStreamSupplier.get().newInstance(buffer);</span>
+<span class="nc" id="L284">                        return new DataInputStream(stream);</span>
+<span class="nc" id="L285">                    } catch (Exception e) {</span>
+<span class="nc" id="L286">                        throw new KafkaException(e);</span>
+                    }
+                case LZ4:
+                    try {
+<span class="nc bnc" id="L290" title="All 2 branches missed.">                        InputStream stream = (InputStream) lz4InputStreamSupplier.get().newInstance(buffer,</span>
+<span class="nc" id="L291">                                messageVersion == Record.MAGIC_VALUE_V0);</span>
+<span class="nc" id="L292">                        return new DataInputStream(stream);</span>
+<span class="nc" id="L293">                    } catch (Exception e) {</span>
+<span class="nc" id="L294">                        throw new KafkaException(e);</span>
+                    }
+                default:
+<span class="nc" id="L297">                    throw new IllegalArgumentException(&quot;Unknown compression type: &quot; + type);</span>
+            }
+<span class="nc" id="L299">        } catch (IOException e) {</span>
+<span class="nc" id="L300">            throw new KafkaException(e);</span>
+        }
+    }
+
+    private interface ConstructorSupplier {
+        Constructor get() throws ClassNotFoundException, NoSuchMethodException;
+    }
+
+    // this code is based on Guava's @see{com.google.common.base.Suppliers.MemoizingSupplier}
+    private static class MemoizingConstructorSupplier {
+        final ConstructorSupplier delegate;
+        transient volatile boolean initialized;
+        transient Constructor value;
+
+<span class="nc" id="L314">        public MemoizingConstructorSupplier(ConstructorSupplier delegate) {</span>
+<span class="nc" id="L315">            this.delegate = delegate;</span>
+<span class="nc" id="L316">        }</span>
+
+        public Constructor get() throws NoSuchMethodException, ClassNotFoundException {
+<span class="nc bnc" id="L319" title="All 2 branches missed.">            if (!initialized) {</span>
+<span class="nc" id="L320">                synchronized (this) {</span>
+<span class="nc bnc" id="L321" title="All 2 branches missed.">                    if (!initialized) {</span>
+<span class="nc" id="L322">                        Constructor constructor = delegate.get();</span>
+<span class="nc" id="L323">                        value = constructor;</span>
+<span class="nc" id="L324">                        initialized = true;</span>
+<span class="nc" id="L325">                        return constructor;</span>
+                    }
+<span class="nc" id="L327">                }</span>
+            }
+<span class="nc" id="L329">            return value;</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.6.201602180812</span></div></body></html>

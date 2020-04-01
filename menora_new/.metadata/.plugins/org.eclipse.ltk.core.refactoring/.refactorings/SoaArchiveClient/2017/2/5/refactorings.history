@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Encapsulate field &apos;il.co.menora.soaarchive.shared.IncomingDtoEx.dbSubCode&apos; in &apos;il.co.menora.soaarchive.shared.IncomingDtoEx&apos;&#x0A;- Original project: &apos;SoaArchiveClient&apos;&#x0A;- Original element: &apos;il.co.menora.soaarchive.shared.IncomingDtoEx.dbSubCode&apos;&#x0A;- Getter method name: &apos;getDbSubCode&apos;&#x0A;- Setter method name: &apos;setDbSubCode&apos;&#x0A;- Field visibility: &apos;public&apos;&#x0A;- Use getter and setter methods in declaring type" comments="false" declaring="true" description="Encapsulate field &apos;dbSubCode&apos;" flags="589830" getter="getDbSubCode" id="org.eclipse.jdt.ui.self.encapsulate" input="/src\/main\/java&lt;il.co.menora.soaarchive.shared{IncomingDtoEx.java[IncomingDtoEx^dbSubCode" insertion="23" setter="setDbSubCode" stamp="1486061812117" version="1.0" visibility="1"/>
+</session>

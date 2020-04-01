@@ -1,0 +1,2 @@
+serviceClass: il.co.menora.soaarchive.client.rpc.SoaArchiveService
+path: DE48FB3FCF93DF4A5F8EB85FAD18923A.gwt.rpc

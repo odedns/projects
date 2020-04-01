@@ -1,0 +1,4 @@
+il\co\menora\soaarchive\web\rest\SoaArchiveService.class
+il\co\menora\soaarchive\web\rpc\SoaArchiveServiceImpl.class
+test\TestServlet.class
+il\co\menora\soaarchive\web\filters\ResponseFilter.class

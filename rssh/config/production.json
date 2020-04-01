@@ -1,0 +1,12 @@
+{
+    "vault" : {
+        "url" : "http://localhost:8200/v1/secret/",
+        "token" : "s.dnj9lnhD58JqPqsayogswT1u",
+        "path":  "body.data"
+    },
+    "certificate" : {
+        "key" : "./star_scrdairy_com.key",
+        "cert" : "./star_scrdairy_com.cert",
+        "passphrase" : ""
+    }
+}

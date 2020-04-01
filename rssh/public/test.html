@@ -1,0 +1,30 @@
+<html>
+
+<body>
+
+<h1>Test page</h1>
+
+<script>
+  function getParameterByName(name) {
+    var match = RegExp('[?&]' + name + '=([^&]*)').exec(window.location.search);
+    return match && decodeURIComponent(match[1].replace(/\+/g, ' '));
+    }  
+var url = window.location;
+document.write('<p>' + url);
+    //var sshPort = location.search.split('sshPort=')[1];
+     // var user = location.search.split('user=')[1];
+     var sshPort = getParameterByName("sshPort");
+     var user =  getParameterByName("user");
+      console.log('sshPort=' +sshPort + ' user='  + user);
+document.write('<p> port=' + sshPort + ' user=' + user);
+    if(sshPort == null) {
+      document.write("<br> sshPort is empty");
+    }
+    var height = window.screen.height;
+    var width = window.screen.width
+    document.write("height=" + height + " width=" + width);
+
+</script>
+</body>
+
+</html>
